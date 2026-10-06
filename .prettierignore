@@ -6,4 +6,6 @@ node_modules/
 CHANGELOG.md
 package-lock.json
 docs/index.html
+# Search Console verification files must stay byte-for-byte as Google issued them.
+docs/google*.html
 site/source.html

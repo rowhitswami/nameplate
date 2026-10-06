@@ -98,6 +98,18 @@ p { margin: 0; }
 }
 .brand { display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-weight: 800; font-size: 26px; letter-spacing: 0.04em; text-transform: uppercase; }
 .brand svg { width: 28px; height: 28px; flex: none; }
+.head-end { display: flex; align-items: center; gap: 10px; margin-left: auto; min-width: 0; }
+/* GitHub link: version, stars and forks are written in at build time and refreshed by the script. */
+.gh { display: inline-flex; align-items: center; gap: 10px; padding: 6px 12px 6px 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--ink); text-decoration: none; transition: border-color 0.15s; }
+.gh:hover, .gh:focus-visible { border-color: color-mix(in srgb, var(--ink) 45%, var(--line)); }
+.gh-mark { width: 24px; height: 24px; flex: none; fill: currentColor; }
+.gh-text { display: grid; gap: 4px; }
+.gh-repo { font: 700 14px/1.1 var(--font-body); }
+.gh-facts { display: flex; gap: 10px; color: var(--muted); font: 600 12.5px/1 var(--font-mono); white-space: nowrap; }
+.gh-facts > span { display: inline-flex; align-items: center; gap: 4px; }
+.gh-facts svg { width: 12px; height: 12px; fill: currentColor; flex: none; }
+@media (max-width: 520px) { .gh-repo { display: none; } .gh { padding: 7px 10px; gap: 8px; } .gh-mark { width: 20px; height: 20px; } }
+@media (max-width: 380px) { .gh-version { display: none !important; } }
 .tablist { display: flex; gap: 4px; background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 4px; }
 .tablist button {
   font: 500 15px/1 var(--font-body); color: var(--muted); background: none; border: 0; border-radius: 999px;
@@ -520,8 +532,21 @@ pre.block { margin: 0; background: var(--ground); border: 1px solid var(--line);
     <svg viewBox="0 0 128 128" aria-hidden="true"><rect width="128" height="128" rx="28" fill="#0f172a"/><rect x="18" y="22" width="92" height="84" rx="12" fill="#1e293b"/><circle cx="30" cy="34" r="3.5" fill="#475569"/><circle cx="41" cy="34" r="3.5" fill="#475569"/><circle cx="52" cy="34" r="3.5" fill="#475569"/><rect x="28" y="48" width="44" height="5" rx="2.5" fill="#334155"/><rect x="28" y="59" width="62" height="5" rx="2.5" fill="#334155"/><path d="M18 84h92v10a12 12 0 0 1-12 12H30a12 12 0 0 1-12-12z" fill="#216de8"/><rect x="26" y="90" width="34" height="9" rx="4.5" fill="#fff"/><circle cx="98" cy="94.5" r="4" fill="#fff" opacity=".85"/></svg>
     Nameplate
   </div>
-  <div class="tablist" role="tablist" aria-label="Page">
-    <button role="tab" id="tab-product" aria-controls="product" aria-selected="true">Product page</button>
+  <div class="head-end">
+    <div class="tablist" role="tablist" aria-label="Page">
+      <button role="tab" id="tab-product" aria-controls="product" aria-selected="true">Product page</button>
+    </div>
+    <a class="gh" href="https://github.com/rowhitswami/nameplate" aria-label="Nameplate on GitHub: v0.3.0, 0 stars, 0 forks">
+      <svg class="gh-mark" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      <span class="gh-text" aria-hidden="true">
+        <span class="gh-repo">rowhitswami/nameplate</span>
+        <span class="gh-facts">
+          <span class="gh-version" title="Latest version"><svg viewBox="0 0 16 16"><path d="M1 7.775V2.75C1 1.784 1.784 1 2.75 1h5.025c.464 0 .91.184 1.238.513l6.25 6.25a1.75 1.75 0 010 2.474l-5.026 5.026a1.75 1.75 0 01-2.474 0l-6.25-6.25A1.752 1.752 0 011 7.775zm1.5 0c0 .066.026.13.073.177l6.25 6.25a.25.25 0 00.354 0l5.025-5.025a.25.25 0 000-.354l-6.25-6.25a.25.25 0 00-.177-.073H2.75a.25.25 0 00-.25.25zM6 5a1 1 0 110 2 1 1 0 010-2z"/></svg><span data-gh="version">v0.3.0</span></span>
+          <span title="Stars"><svg viewBox="0 0 16 16"><path d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.75.75 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L.818 6.374a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25z"/></svg><span data-gh="stars">0</span></span>
+          <span title="Forks"><svg viewBox="0 0 16 16"><path d="M5 5.372v.878c0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75v-.878a2.25 2.25 0 111.5 0v.878a2.25 2.25 0 01-2.25 2.25h-1.5v2.128a2.251 2.251 0 11-1.5 0V8.5h-1.5A2.25 2.25 0 013.5 6.25v-.878a2.25 2.25 0 111.5 0zM5 3.25a.75.75 0 10-1.5 0 .75.75 0 001.5 0zm6.75.75a.75.75 0 100-1.5.75.75 0 000 1.5zm-3 8.75a.75.75 0 10-1.5 0 .75.75 0 001.5 0z"/></svg><span data-gh="forks">0</span></span>
+        </span>
+      </span>
+    </a>
   </div>
 </header>
 
@@ -867,6 +892,36 @@ Install the CLI, then run:
     });
   });
 })();
+  // GitHub link: refresh version, stars and forks at most once an hour; keep the built-in numbers on any failure.
+  (function () {
+    var link = document.querySelector('.gh');
+    if (!link || !window.fetch || /[?&]render=/.test(location.search)) { return; }
+    var KEY = 'nameplate-gh';
+    function field(name) { return link.querySelector('[data-gh="' + name + '"]'); }
+    function compact(n) { return n >= 1000 ? (Math.round(n / 100) / 10 + 'k').replace('.0k', 'k') : String(n); }
+    function show(d) {
+      if (typeof d.stars === 'number') { field('stars').textContent = compact(d.stars); }
+      if (typeof d.forks === 'number') { field('forks').textContent = compact(d.forks); }
+      if (d.version) { field('version').textContent = 'v' + d.version; }
+      link.setAttribute('aria-label', 'Nameplate on GitHub: ' + field('version').textContent + ', ' + field('stars').textContent + ' stars, ' + field('forks').textContent + ' forks');
+    }
+    var cached = null;
+    try { cached = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) {}
+    if (cached && Date.now() - cached.at < 3600000) { show(cached); return; }
+    function json(url) { return fetch(url).then(function (r) { return r.ok ? r.json() : null; }, function () { return null; }); }
+    Promise.all([
+      json('https://api.github.com/repos/rowhitswami/nameplate'),
+      json('https://open-vsx.org/api/rowhitswami/nameplate')
+    ]).then(function (res) {
+      var repo = res[0], ext = res[1];
+      if (!repo && !ext) { return; }
+      var d = { at: Date.now() };
+      if (repo) { d.stars = repo.stargazers_count; d.forks = repo.forks_count; }
+      if (ext && ext.version) { d.version = ext.version; }
+      show(d);
+      try { localStorage.setItem(KEY, JSON.stringify(d)); } catch (e) {}
+    });
+  })();
 </script>
 </body>
 </html>

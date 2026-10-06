@@ -73,6 +73,8 @@ export default tseslint.config(
         URL: 'readonly',
         Buffer: 'readonly',
         setTimeout: 'readonly',
+        fetch: 'readonly',
+        AbortSignal: 'readonly',
         // used inside puppeteer page.evaluate() callbacks, which run in the browser
         document: 'readonly',
       },

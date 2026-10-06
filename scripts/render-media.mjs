@@ -59,7 +59,10 @@ const DESCRIPTION =
 const source = readFileSync(join(root, 'site', 'source.html'), 'utf8');
 const split = source.indexOf('<header');
 // The launch kit (private publishing notes) is only merged in for the owner's preview, never here.
-const body = source.slice(split).replace(/\s*<!-- launch-kit:(tab|panel) -->/g, '');
+const body = fillGitHubLink(
+  source.slice(split).replace(/\s*<!-- launch-kit:(tab|panel) -->/g, ''),
+  { version: manifest.version, ...(await githubNumbers()) },
+);
 const head = source.slice(0, split).replace(/<title>[^<]*<\/title>/, '');
 
 /** The visible questions and answers, reused for structured data and llms.txt. */
@@ -190,6 +193,42 @@ ${faq.map(({ q, a }) => `### ${q}\n\n${a}`).join('\n\n')}
 `,
 );
 console.log(`wrote docs/index.html (${faq.length} FAQ entries), sitemap.xml, llms.txt, icon.png`);
+
+/** Stars and forks from GitHub, or nothing when it doesn't answer (the page then keeps its numbers). */
+async function githubNumbers() {
+  try {
+    const response = await fetch('https://api.github.com/repos/rowhitswami/nameplate', {
+      signal: AbortSignal.timeout(10_000),
+    });
+    if (!response.ok) {
+      return {};
+    }
+    const repo = await response.json();
+    return { stars: repo.stargazers_count, forks: repo.forks_count };
+  } catch {
+    return {};
+  }
+}
+
+/** Writes the version, stars and forks into the header's GitHub link, the same way the page's script does. */
+function fillGitHubLink(html, { version, stars, forks }) {
+  const compact = (n) =>
+    n >= 1000 ? `${Math.round(n / 100) / 10}k`.replace('.0k', 'k') : String(n);
+  const values = { version: `v${version}`, stars, forks };
+  let out = html;
+  for (const [key, value] of Object.entries(values)) {
+    if (value === undefined) {
+      continue;
+    }
+    const text = typeof value === 'number' ? compact(value) : value;
+    out = out.replace(new RegExp(`(data-gh="${key}">)[^<]*`), `$1${text}`);
+  }
+  const read = (key) => out.match(new RegExp(`data-gh="${key}">([^<]*)`))?.[1] ?? '';
+  return out.replace(
+    /(class="gh"[^>]*aria-label=")[^"]*/,
+    `$1Nameplate on GitHub: ${read('version')}, ${read('stars')} stars, ${read('forks')} forks`,
+  );
+}
 
 function plain(html) {
   return html

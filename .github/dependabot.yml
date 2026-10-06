@@ -4,6 +4,9 @@ updates:
     directory: /
     schedule:
       interval: monthly
+    ignore:
+      # Must stay equal to engines.vscode in package.json, or packaging fails.
+      - dependency-name: '@types/vscode'
     groups:
       dev-dependencies:
         dependency-type: development

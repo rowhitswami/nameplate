@@ -1,0 +1,50 @@
+# Nameplate for VS Code
+
+> Nameplate is a free VS Code extension that shows the project name in the status bar and gives every window its own color, so you can tell projects apart at a glance. Works in Cursor, Windsurf and Antigravity.
+
+Nameplate adds the project's name to the left end of the VS Code status bar and colors the whole status bar, a different color for each project. Colors are chosen automatically from the Git remote, windows that are open at the same time never share a color, and the color settings are kept out of Git with a local exclude entry or Git filter. It has no settings that need changing, makes no network requests and has no telemetry.
+
+## Links
+
+- [Product page](https://rowhitswami.github.io/nameplate/)
+- [Source code and documentation](https://github.com/rowhitswami/nameplate)
+- [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=rowhitswami.nameplate)
+- [Open VSX (Cursor, Windsurf, Antigravity, Kiro, Positron, VSCodium)](https://open-vsx.org/extension/rowhitswami/nameplate)
+
+## Facts
+
+- Extension ID: rowhitswami.nameplate
+- Version: 0.3.0
+- Requires: VS Code 1.85 or later, or an editor built on it
+- License: MIT, free
+- Author: Rohit Swami
+
+## Questions
+
+### How can I tell VS Code windows apart?
+
+Give every project its own status bar color and show its name. Nameplate does both automatically. It reads the project name from the folder, package.json or the Git remote, and gives each project a color that looks different from the other open windows.
+
+### How do I change the status bar color for one project?
+
+VS Code reads workbench.colorCustomizations from the project's .vscode/settings.json and applies it to that window only. Nameplate writes the status bar colors there for you, picks a readable text color, and lets you choose another color by clicking the project name.
+
+### Will it change files in my Git repository?
+
+The colors have to be in .vscode/settings.json, but Git never sees them. A settings file Nameplate creates is listed in .git/info/exclude, and in a settings file you commit, a local Git filter hides Nameplate's lines. Nothing shows up in git status or in a commit.
+
+### Does it work in Cursor, Windsurf, Antigravity or Kiro?
+
+Yes. Nameplate uses the standard extension API. Cursor, Windsurf, Antigravity, Kiro, Positron and VSCodium install it from Open VSX, and VS Code installs it from the Visual Studio Marketplace.
+
+### How is it different from Peacock?
+
+Peacock colors the title bar, activity bar and status bar with colors you choose and stores them in the workspace settings. Nameplate picks colors automatically, adds the project name, keeps open windows from sharing a color, and keeps the settings out of Git. You can use both; Nameplate leaves colors set by Peacock alone.
+
+### Does it collect any data?
+
+No. Nameplate makes no network requests and has no telemetry. Everything it stores stays in VS Code's storage on your computer.
+
+### Is it free?
+
+Yes. Nameplate is free and open source under the MIT license.

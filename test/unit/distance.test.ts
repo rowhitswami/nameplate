@@ -31,21 +31,27 @@ describe('OKLab distance', () => {
     assert.equal(looksSame('#2563eb', '#06b6d4'), false); // blue vs cyan
   });
 
-  it('keeps the automatic palette free of exact near-duplicates of lime', () => {
-    for (const color of AUTO_PALETTE.filter((c) => c !== '#65a30d')) {
-      assert.ok(colorDistance('#65a30d', color) >= PREFERRED_DISTANCE, color);
+  it('keeps every pair of automatic colors comfortably apart', () => {
+    for (let i = 0; i < AUTO_PALETTE.length; i++) {
+      for (let j = i + 1; j < AUTO_PALETTE.length; j++) {
+        const a = AUTO_PALETTE[i] ?? '';
+        const b = AUTO_PALETTE[j] ?? '';
+        assert.ok(
+          colorDistance(a, b) >= PREFERRED_DISTANCE,
+          `${a} vs ${b}: ${colorDistance(a, b)}`,
+        );
+      }
     }
   });
 
-  it('offers at least seven mutually distinct automatic colors', () => {
-    // Greedy check: there is a set of 7 palette colors that are pairwise distinct.
+  it('can tell eleven open windows apart', () => {
     const chosen: string[] = [];
     for (const color of AUTO_PALETTE) {
       if (minDistance(color, chosen) >= MIN_DISTINCT_DISTANCE) {
         chosen.push(color);
       }
     }
-    assert.ok(chosen.length >= 7, chosen.join(' '));
+    assert.equal(chosen.length, 11, chosen.join(' '));
   });
 
   it('computes the minimum distance to a set', () => {

@@ -1,8 +1,8 @@
 {
   "name": "nameplate",
   "displayName": "Nameplate",
-  "description": "Gives every VS Code window a project name and its own status bar color, so you always know which project you are working in.",
-  "version": "0.2.0",
+  "description": "Shows the project name in the status bar and gives every VS Code window its own color, so you always know which project you are in. Works in Cursor, Windsurf, Antigravity and other editors built on VS Code.",
+  "version": "0.3.0",
   "publisher": "rowhitswami",
   "license": "MIT",
   "author": {
@@ -15,7 +15,7 @@
   "bugs": {
     "url": "https://github.com/rowhitswami/nameplate/issues"
   },
-  "homepage": "https://github.com/rowhitswami/nameplate#readme",
+  "homepage": "https://rowhitswami.github.io/nameplate/",
   "engines": {
     "vscode": "^1.85.0"
   },
@@ -23,14 +23,24 @@
     "Other"
   ],
   "keywords": [
-    "project",
-    "workspace",
-    "window",
+    "project name",
     "status bar",
+    "status bar color",
+    "window color",
+    "workspace color",
+    "multiple windows",
+    "project identity",
     "color",
-    "identity",
-    "multi-window",
-    "peacock"
+    "peacock",
+    "title",
+    "git",
+    "productivity",
+    "cursor",
+    "windsurf",
+    "antigravity",
+    "kiro",
+    "vscodium",
+    "open vsx"
   ],
   "icon": "media/icon.png",
   "galleryBanner": {

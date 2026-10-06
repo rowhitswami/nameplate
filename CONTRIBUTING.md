@@ -31,7 +31,7 @@ Thanks for helping. This document covers the workflow and the few rules that kee
 
 ## Rules that must hold
 
-1. **Never reorder, remove or recolor an entry of the automatic palette** (0.1.1 replaced olive with lime before any public release; don't do that again after publishing) in `src/core/colors/palette.ts` (`auto: true`). The automatic color of every existing project depends on that order. Add new automatic colors at the end only. A unit test freezes the current list.
+1. **Never reorder, remove or recolor an entry of the automatic palette** (it was redesigned in 0.3.0, before the first Marketplace release; don't do that again after publishing) in `src/core/colors/palette.ts` (`auto: true`). The automatic color of every existing project depends on that order. Add new automatic colors at the end only. A unit test freezes the current list.
 2. **Never change `stableHash`, `seededPermutation` or `candidateOrder`** for the same reason. A unit test pins known key → color pairs.
 3. **Only write the managed keys** of `workbench.colorCustomizations` and only through the planner in `src/core/colors/colorCustomizations.ts`. Every write must be reversible from the ownership record.
 4. **No telemetry, no network, no new runtime dependencies** without a very good reason. The extension currently has none.

@@ -110,7 +110,7 @@ describe('registry file', () => {
   it('gives simultaneously activating processes clearly different colors', async function () {
     this.timeout(30_000);
     // Six "windows" whose canonical colors are all the same, starting in the same millisecond.
-    const keys = ['demo-26', 'demo-27', 'demo-51', 'demo-63', 'demo-75', 'demo-90'].map(
+    const keys = ['demo-0', 'demo-3', 'demo-8', 'demo-10', 'demo-23', 'demo-36'].map(
       (name) => `git:github.com/acme/${name}`,
     );
     const startAt = Date.now() + 1500;

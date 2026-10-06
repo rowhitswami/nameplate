@@ -8,7 +8,7 @@
   <rect x="28" y="48" width="44" height="5" rx="2.5" fill="#334155"/>
   <rect x="28" y="59" width="62" height="5" rx="2.5" fill="#334155"/>
   <rect x="28" y="70" width="36" height="5" rx="2.5" fill="#334155"/>
-  <path d="M18 84h92v10a12 12 0 0 1-12 12H30a12 12 0 0 1-12-12z" fill="#2563eb"/>
+  <path d="M18 84h92v10a12 12 0 0 1-12 12H30a12 12 0 0 1-12-12z" fill="#216de8"/>
   <rect x="26" y="90" width="34" height="9" rx="4.5" fill="#ffffff"/>
   <circle cx="98" cy="94.5" r="4" fill="#ffffff" opacity="0.85"/>
 </svg>

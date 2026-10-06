@@ -81,7 +81,7 @@ p { margin: 0; }
 
 /* ---------- label tape ---------- */
 .tape {
-  --c: #2563eb; --t: #fff;
+  --c: #216de8; --t: #fff;
   display: inline-flex; align-items: center; gap: 0.45em;
   background: linear-gradient(180deg, color-mix(in srgb, #fff 16%, var(--c)) 0%, var(--c) 46%, color-mix(in srgb, #000 12%, var(--c)) 100%);
   color: var(--t);
@@ -96,6 +96,25 @@ p { margin: 0; }
 .hero { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: clamp(24px, 4vw, 56px); align-items: center; padding-block: 40px 56px; }
 .hero h1 { font-family: var(--font-display); font-weight: 900; font-size: clamp(54px, 8.4vw, 104px); line-height: 0.88; text-transform: uppercase; letter-spacing: 0.005em; margin-block: 0 20px; }
 .lede { font-size: 19px; color: var(--muted); max-width: 34em; }
+/* The tape under the headline names the window that is in front, in its color. */
+.answer { margin: 0 0 22px; }
+.answer .tape { display: inline-grid; font-size: clamp(20px, 2.4vw, 28px); background-image: linear-gradient(180deg, rgb(255 255 255 / 0.16), transparent 46%, rgb(0 0 0 / 0.12)); background-color: #216de8; color: #fff; animation: answer 12s infinite; transform: rotate(-1.5deg); }
+.answer .tape > span { grid-area: 1 / 1; opacity: 0; }
+.answer .a1 { opacity: 1; animation: a1 12s infinite; } .answer .a2 { animation: a2 12s infinite; } .answer .a3 { animation: a3 12s infinite; }
+.answer .a4 { animation: a4 12s infinite; } .answer .a5 { animation: a5 12s infinite; }
+@keyframes answer {
+  0%, 23% { background-color: #216de8; color: #fff; }
+  25%, 48% { background-color: #9051eb; color: #fff; }
+  50%, 55% { background-color: #c3ea43; color: #000; }
+  57%, 85% { background-color: #3a3d45; color: #cfd3da; }
+  87%, 98% { background-color: #c74b15; color: #fff; }
+  100% { background-color: #216de8; color: #fff; }
+}
+@keyframes a1 { 0%, 23% { opacity: 1; } 25%, 98% { opacity: 0; } 100% { opacity: 1; } }
+@keyframes a2 { 0%, 23% { opacity: 0; } 25%, 48% { opacity: 1; } 50%, 100% { opacity: 0; } }
+@keyframes a3 { 0%, 48% { opacity: 0; } 50%, 55% { opacity: 1; } 57%, 100% { opacity: 0; } }
+@keyframes a4 { 0%, 55% { opacity: 0; } 57%, 85% { opacity: 1; } 87%, 100% { opacity: 0; } }
+@keyframes a5 { 0%, 85% { opacity: 0; } 87%, 98% { opacity: 1; } 100% { opacity: 0; } }
 .lede strong { color: var(--ink); font-weight: 700; }
 .cta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; align-items: center; }
 .btn { display: inline-flex; align-items: center; gap: 8px; font: 700 15px/1 var(--font-body); padding: 13px 18px; border-radius: 8px; text-decoration: none; border: 1px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; }
@@ -105,7 +124,9 @@ p { margin: 0; }
 .copy { font: 600 12px/1 var(--font-body); color: var(--accent); background: none; border: 0; cursor: pointer; padding: 4px 6px; border-radius: 4px; flex: none; }
 
 /* ---------- stages (shared) ---------- */
+/* Status bars inherit --c and --t, so a window (or a hero slot) can set its color once. */
 .stage {
+  --c: #216de8; --t: #fff;
   position: relative; container-type: inline-size; width: 100%; max-width: 100%;
   background-color: var(--desk);
   background-image: radial-gradient(var(--desk-dot) 1px, transparent 1.2px);
@@ -130,7 +151,6 @@ p { margin: 0; }
 .code { padding: 0.9cqw 1.4cqw; overflow: hidden; white-space: pre; }
 .code .k { color: var(--win-key); } .code .s { color: var(--win-str); } .code .n { color: var(--win-num); } .code .f { color: var(--win-fn); } .code .c { color: #637081; }
 .sb {
-  --c: #2563eb; --t: #fff;
   display: flex; align-items: center; gap: 1.6cqw; height: 3cqw; padding-inline: 0.9cqw;
   background: var(--c); color: var(--t); font-family: var(--font-body); font-size: 1.25cqw; white-space: nowrap;
 }
@@ -140,16 +160,30 @@ p { margin: 0; }
 .sb .right { margin-left: auto; opacity: 0.85; }
 
 /* ---------- hero desk: windows take turns in front; unfocused ones keep their color ---------- */
-.desk { aspect-ratio: 16 / 11; }
-.desk .win { width: 57%; height: 44%; animation: front 12s infinite; }
-.desk .win .titlebar, .desk .win .body { animation: dim 12s infinite; }
-.desk .win:nth-child(1) { left: 3%; top: 4%; }
-.desk .win:nth-child(2) { left: 40%; top: 9%; animation-delay: -9s; }
-.desk .win:nth-child(3) { left: 6%; top: 51%; animation-delay: -6s; }
-.desk .win:nth-child(4) { left: 39%; top: 54%; animation-delay: -3s; }
-.desk .win:nth-child(2) .titlebar, .desk .win:nth-child(2) .body { animation-delay: -9s; }
-.desk .win:nth-child(3) .titlebar, .desk .win:nth-child(3) .body { animation-delay: -6s; }
-.desk .win:nth-child(4) .titlebar, .desk .win:nth-child(4) .body { animation-delay: -3s; }
+.desk { aspect-ratio: 16 / 11; perspective: 150cqw; }
+/* The windows sit on a slightly tilted desk that drifts slowly. */
+.desk .tilt { position: absolute; inset: 0; transform-style: preserve-3d; transform: rotateX(9deg) rotateY(-9deg) rotateZ(1deg) scale(0.93); animation: drift 14s ease-in-out infinite; }
+@keyframes drift {
+  0%, 100% { transform: rotateX(9deg) rotateY(-9deg) rotateZ(1deg) scale(0.93); }
+  50% { transform: rotateX(6deg) rotateY(-4deg) rotateZ(0.2deg) scale(0.93); }
+}
+.desk .slot { position: absolute; width: 57%; height: 42%; animation: front 12s infinite; }
+.desk .slot > .win { inset: 0; }
+/* Each status bar casts its color onto the desk below it. */
+.desk .slot::before { content: ""; position: absolute; left: 4%; right: 4%; bottom: -16%; height: 36%; border-radius: 50%; background: var(--c); filter: blur(4.5cqw); opacity: 0.5; animation: glow 12s infinite; }
+@keyframes glow { 0%, 55% { opacity: 0.5; } 57%, 85% { opacity: 0; } 87%, 100% { opacity: 0.5; } }
+.desk .slot .titlebar, .desk .slot .body { animation: dim 12s infinite; }
+.desk .slot:nth-child(1) { left: 3%; top: 4%; }
+.desk .slot:nth-child(2) { left: 40%; top: 9%; animation-delay: -9s; }
+.desk .slot:nth-child(3) { left: 6%; top: 53%; animation-delay: -6s; }
+.desk .slot:nth-child(4) { left: 39%; top: 56%; animation-delay: -3s; }
+.desk .slot:nth-child(2) .titlebar, .desk .slot:nth-child(2) .body { animation-delay: -9s; }
+.desk .slot:nth-child(3) .titlebar, .desk .slot:nth-child(3) .body { animation-delay: -6s; }
+.desk .slot:nth-child(4) .titlebar, .desk .slot:nth-child(4) .body { animation-delay: -3s; }
+/* When the colors come back, a light passes over each bar, like a label being printed. */
+.desk .sb { position: relative; overflow: hidden; }
+.desk .sb::after { content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 25%, rgb(255 255 255 / 0.55) 50%, transparent 75%); transform: translateX(-120%); animation: sweep 12s infinite; pointer-events: none; }
+@keyframes sweep { 0%, 86% { transform: translateX(-120%); } 91.5%, 100% { transform: translateX(120%); } }
 @keyframes front {
   0%, 23% { z-index: 6; transform: translateY(-1.2cqw); box-shadow: 0 2.6cqw 5cqw rgb(0 0 0 / 0.4), 0 0 0 1px rgb(0 0 0 / 0.4); }
   25.5%, 97.5% { z-index: 1; transform: none; box-shadow: 0 1.2cqw 3cqw rgb(0 0 0 / 0.28), 0 0 0 1px rgb(0 0 0 / 0.35); }
@@ -199,14 +233,14 @@ section.feature.flip .copytext { order: 2; }
 .editors { display: grid; gap: 28px; padding-block: 48px; border-top: 1px solid var(--line); }
 .editors .intro { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: clamp(20px, 4vw, 56px); align-items: end; }
 .editor-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px 18px; }
-.ed { display: grid; gap: 10px; min-width: 0; }
+.ed { display: grid; gap: 10px; min-width: 0; align-content: start; }
 .ed-win { container-type: inline-size; aspect-ratio: 16 / 10; background: var(--win); border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 6px 18px rgb(0 0 0 / 0.16), 0 0 0 1px rgb(0 0 0 / 0.3); }
 .ed-win .tb { height: 9cqw; flex: none; background: var(--win-2); border-bottom: 1px solid var(--win-line); display: flex; align-items: center; gap: 2cqw; padding-inline: 3.5cqw; }
 .ed-win .tb i { width: 2.8cqw; height: 2.8cqw; border-radius: 50%; background: #4a4d55; display: block; }
 .ed-win .lines { flex: 1; padding: 5cqw; display: grid; gap: 3cqw; align-content: start; }
 .ed-win .lines b { display: block; height: 2.4cqw; border-radius: 2cqw; background: #3a3d46; }
 .ed-win .lines b:nth-child(2) { background: #5b4a7a; } .ed-win .lines b:nth-child(4) { background: #43604b; }
-.ed-win .bar { --c: #2563eb; --t: #fff; height: 11cqw; flex: none; display: flex; align-items: center; gap: 2cqw; padding-inline: 3.5cqw; background: var(--c); color: var(--t); font: 700 5.4cqw/1 var(--font-body); letter-spacing: 0.04em; white-space: nowrap; }
+.ed-win .bar { --c: #216de8; --t: #fff; height: 11cqw; flex: none; display: flex; align-items: center; gap: 2cqw; padding-inline: 3.5cqw; background: var(--c); color: var(--t); font: 700 5.4cqw/1 var(--font-body); letter-spacing: 0.04em; white-space: nowrap; }
 /* When the section scrolls into view, the editors get their nameplates one after another. Fully colored at rest. */
 .editor-grid.play .bar { animation: light 0.9s both; animation-delay: calc(var(--i) * 160ms + 150ms); }
 .ed-win .bar svg { width: 5.4cqw; height: 5.4cqw; flex: none; }
@@ -214,8 +248,16 @@ section.feature.flip .copytext { order: 2; }
 .ed-meta { display: grid; gap: 4px; }
 .ed-meta strong { font-size: 17px; }
 .ed-meta span { color: var(--muted); font-size: 14.5px; }
-.reg { justify-self: start; font: 600 12px/1 var(--font-mono); padding: 5px 7px; border-radius: 5px; background: color-mix(in srgb, var(--ink) 7%, transparent); color: var(--ink); }
+.reg { justify-self: start; font: 600 12px/1.3 var(--font-mono); padding: 3px 7px; border-radius: 5px; background: color-mix(in srgb, var(--ink) 7%, transparent); color: var(--ink); }
 .editors .foot { color: var(--muted); font-size: 15.5px; max-width: 52em; }
+
+/* questions */
+.faq { display: grid; gap: 22px; padding-block: 48px; border-top: 1px solid var(--line); }
+.faq h2 { font-family: var(--font-display); font-weight: 800; font-size: clamp(36px, 4.6vw, 54px); line-height: 0.95; text-transform: uppercase; letter-spacing: 0.01em; }
+.qa { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 40px; }
+.qa > div { display: grid; gap: 6px; align-content: start; min-width: 0; }
+.qa h3 { font-size: 18px; font-weight: 700; }
+.qa p { color: var(--muted); font-size: 16px; }
 
 /* notes */
 .notes { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: clamp(20px, 4vw, 56px); padding-block: 44px; border-top: 1px solid var(--line); }
@@ -282,46 +324,50 @@ section.feature.flip .copytext { order: 2; }
 .menu .win { inset: 6% 6% 6% 6%; font-size: 1.35cqw; }
 .menu .sb { animation: preview 9s infinite; }
 @keyframes preview {
-  0%, 46% { background: #2563eb; color: #fff; }
-  47%, 52% { background: #0f766e; color: #fff; }
-  53%, 58% { background: #15803d; color: #fff; }
-  59%, 95% { background: #7e22ce; color: #fff; }
-  97%, 100% { background: #2563eb; color: #fff; }
+  0%, 46% { background: #216de8; color: #fff; }
+  47%, 52% { background: #158280; color: #fff; }
+  53%, 58% { background: #0c6427; color: #fff; }
+  59%, 95% { background: #9051eb; color: #fff; }
+  97%, 100% { background: #216de8; color: #fff; }
 }
 .qp {
-  position: absolute; left: 50%; top: 11%; width: 56%; transform: translateX(-50%);
-  background: #25272e; border: 1px solid #3a3d46; border-radius: 0.9cqw; box-shadow: 0 1.6cqw 4cqw rgb(0 0 0 / 0.5);
-  font-family: var(--font-body); font-size: 1.3cqw; color: #d8dbe2; overflow: hidden; opacity: 0;
+  position: absolute; left: 50%; top: 10%; width: 58%; transform: translateX(-50%);
+  background: #252526; border: 1px solid #454545; border-radius: 0.8cqw; box-shadow: 0 1cqw 2.4cqw rgb(0 0 0 / 0.55);
+  font-family: var(--font-body); font-size: 1.3cqw; line-height: 1; color: #cccccc; overflow: hidden; opacity: 0; padding-bottom: 0.6cqw;
 }
-.qp .q-title { padding: 0.8cqw 1.2cqw 0.4cqw; font-size: 1.1cqw; color: #8f95a1; text-align: center; }
-.qp .q-input { margin: 0 1cqw 0.8cqw; padding: 0.55cqw 0.8cqw; border: 1px solid #4a7cff; border-radius: 0.5cqw; color: #8f95a1; font-size: 1.15cqw; }
-.qp ul { list-style: none; margin: 0; padding: 0 0 0.6cqw; position: relative; }
-.qp li { display: flex; align-items: center; gap: 0.9cqw; padding: 0.42cqw 1.2cqw; white-space: nowrap; position: relative; z-index: 1; }
-.qp li .d { margin-left: auto; color: #8f95a1; font-size: 1.05cqw; }
-.qp li i { width: 1.3cqw; height: 1.3cqw; border-radius: 50%; display: inline-block; flex: none; box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.25); }
-.qp .hl { position: absolute; left: 0.5cqw; right: 0.5cqw; height: 2.35cqw; top: 0; border-radius: 0.45cqw; background: #04395e; z-index: 0; }
+/* Both menus share one geometry: fixed title, input and row heights, so the highlight moves in exact row steps. */
+.qp .q-title { height: 2.8cqw; display: flex; align-items: center; justify-content: center; font-size: 1.15cqw; color: #9d9d9d; }
+.qp .q-input { height: 2.6cqw; display: flex; align-items: center; margin: 0 0.8cqw 0.8cqw; padding: 0 0.8cqw; border: 1px solid #0078d4; border-radius: 0.4cqw; background: #313131; color: #8b8b8b; font-size: 1.15cqw; }
+.qp ul { list-style: none; margin: 0; padding: 0 0.6cqw; position: relative; }
+.qp li { display: flex; align-items: center; gap: 0.9cqw; height: 2.6cqw; padding: 0 0.8cqw; white-space: nowrap; position: relative; z-index: 1; }
+.qp li .ic { width: 1.4cqw; height: 1.4cqw; flex: none; display: grid; place-items: center; font-size: 1.2cqw; color: #c5c5c5; }
+.qp li .sw { width: 1.3cqw; height: 1.3cqw; border-radius: 50%; box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.25); }
+.qp li .d { margin-left: auto; color: #9d9d9d; font-size: 1.1cqw; }
+.qp .hl { position: absolute; left: 0.6cqw; right: 0.6cqw; top: 0; height: 2.6cqw; border-radius: 0.4cqw; background: #04395e; box-shadow: inset 0 0 0 1px #0078d4; z-index: 0; }
 .qp.actions { animation: qp1 9s infinite; }
 .qp.actions .hl { animation: hl1 9s infinite; }
 .qp.colors { animation: qp2 9s infinite; }
 .qp.colors .hl { animation: hl2 9s infinite; }
 @keyframes qp1 { 0%, 23% { opacity: 0; transform: translateX(-50%) translateY(-0.6cqw); } 25%, 38% { opacity: 1; transform: translateX(-50%); } 39.5%, 100% { opacity: 0; transform: translateX(-50%); } }
-@keyframes hl1 { 0%, 31% { transform: translateY(0); } 33%, 100% { transform: translateY(2.35cqw); } }
+@keyframes hl1 { 0%, 31% { transform: translateY(0); } 33%, 100% { transform: translateY(2.6cqw); } }
 @keyframes qp2 { 0%, 39.5% { opacity: 0; } 41%, 66% { opacity: 1; } 68%, 100% { opacity: 0; } }
-@keyframes hl2 { 0%, 46% { transform: translateY(0); } 47%, 52% { transform: translateY(2.35cqw); } 53%, 58% { transform: translateY(4.7cqw); } 59%, 100% { transform: translateY(7.05cqw); } }
+@keyframes hl2 { 0%, 46% { transform: translateY(0); } 47%, 52% { transform: translateY(2.6cqw); } 53%, 58% { transform: translateY(5.2cqw); } 59%, 100% { transform: translateY(7.8cqw); } }
 .pointer { position: absolute; width: 2.4cqw; height: 2.4cqw; left: 60%; top: 55%; animation: point 9s infinite; z-index: 9; filter: drop-shadow(0 0.2cqw 0.4cqw rgb(0 0 0 / 0.5)); }
 @keyframes point {
   0%, 8% { left: 60%; top: 55%; transform: none; }
-  20%, 23% { left: 9.5%; top: 88.5%; transform: none; }
-  24% { left: 9.5%; top: 88.5%; transform: scale(0.85); }
-  25%, 28% { left: 9.5%; top: 88.5%; transform: none; }
-  34%, 37% { left: 40%; top: 27.5%; transform: none; }
-  38% { left: 40%; top: 27.5%; transform: scale(0.85); }
-  39%, 61% { left: 40%; top: 27.5%; transform: none; }
-  64%, 65% { left: 40%; top: 39%; transform: none; }
-  66% { left: 40%; top: 39%; transform: scale(0.85); }
-  68%, 100% { left: 60%; top: 55%; transform: none; }
+  20%, 23% { left: 8.5%; top: 91.3%; transform: none; }
+  24% { left: 8.5%; top: 91.3%; transform: scale(0.85); }
+  25%, 28% { left: 8.5%; top: 91.3%; transform: none; }
+  33%, 37% { left: 33.5%; top: 26.1%; transform: none; }
+  38% { left: 33.5%; top: 26.1%; transform: scale(0.85); }
+  39%, 51% { left: 33.5%; top: 26.1%; transform: none; }
+  53%, 57% { left: 33.5%; top: 30.2%; transform: none; }
+  59%, 64% { left: 33.5%; top: 34.4%; transform: none; }
+  65% { left: 33.5%; top: 34.4%; transform: scale(0.85); }
+  66%, 67% { left: 33.5%; top: 34.4%; transform: none; }
+  72%, 100% { left: 60%; top: 55%; transform: none; }
 }
-.toast { position: absolute; left: 7.2%; bottom: 3.6%; font-family: var(--font-body); font-size: 1.2cqw; color: #e7e9ee; background: rgb(0 0 0 / 0.55); padding: 0.4cqw 0.9cqw; border-radius: 0.5cqw; opacity: 0; animation: toast 9s infinite; }
+.toast { position: absolute; left: 24%; top: 91.6%; transform: translateY(-50%); z-index: 3; font-family: var(--font-body); font-size: 1.25cqw; color: #fff; white-space: nowrap; opacity: 0; animation: toast 9s infinite; }
 @keyframes toast { 0%, 67% { opacity: 0; } 69%, 90% { opacity: 1; } 93%, 100% { opacity: 0; } }
 
 /* ---------- git: the color is on disk, Git never sees it ---------- */
@@ -330,8 +376,8 @@ section.feature.flip .copytext { order: 2; }
 .gitstage .editor { left: 3%; width: 51%; }
 .gitstage .term { left: 56%; right: 3%; z-index: 2; }
 .gitstage .win .code { line-height: 1.7; }
-.band { background: color-mix(in srgb, #0f766e 26%, transparent); display: block; margin-inline: -1.4cqw; padding-inline: 1.4cqw; position: relative; }
-.band .tag { position: absolute; right: 1cqw; bottom: 0.25cqw; font-family: var(--font-body); font-size: 0.95cqw; background: #0f766e; color: #fff; border-radius: 0.4cqw; padding: 0 0.6cqw; }
+.band { background: color-mix(in srgb, #158280 26%, transparent); display: block; margin-inline: -1.4cqw; padding-inline: 1.4cqw; position: relative; }
+.band .tag { position: absolute; right: 1cqw; bottom: 0.25cqw; font-family: var(--font-body); font-size: 0.95cqw; background: #158280; color: #fff; border-radius: 0.4cqw; padding: 0 0.6cqw; }
 .swap { display: inline-grid; }
 .swap > span { grid-area: 1 / 1; }
 .swap .a { animation: swapa 10s infinite; }
@@ -404,7 +450,7 @@ pre.block { margin: 0; background: var(--ground); border: 1px solid var(--line);
 @media (max-width: 860px) {
   .hero, section.feature, section.feature.flip { grid-template-columns: minmax(0, 1fr); }
   section.feature.flip .copytext { order: 0; }
-  .problem, .notes, .editors .intro, .dest, .status-grid, .release { grid-template-columns: minmax(0, 1fr); }
+  .problem, .notes, .editors .intro, .qa, .dest, .status-grid, .release { grid-template-columns: minmax(0, 1fr); }
   .editor-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .hero { padding-block: 24px 40px; }
 }
@@ -417,20 +463,33 @@ pre.block { margin: 0; background: var(--ground); border: 1px solid var(--line);
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
+  .desk .tilt { transform: rotateX(8deg) rotateY(-7deg) rotateZ(0.6deg) scale(0.93); }
   .qp.actions { opacity: 1; }
   .qp.actions .hl { transform: translateY(2.35cqw); }
   .qp.colors, .lock, .toast, .pointer { display: none; }
+}
+
+/* ---------- scroll reveals: things rise into place; they are never hidden ---------- */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal { animation: rise linear both; animation-timeline: view(); animation-range: entry 0% entry 90%; }
+    @keyframes rise { from { transform: translateY(28px) scale(0.98); } to { transform: none; } }
+  }
 }
 
 /* ---------- render mode (local only): one scene at a fixed size, for README GIFs ---------- */
 .render-mode body { padding: 0; background: #12151b; }
 .render-mode body > *:not(.render-target) { display: none !important; }
 .render-target { width: 880px !important; margin: 0 !important; border-radius: 0 !important; border: 0 !important; }
+/* GIFs stay flat and crisp: no tilt, no glow, no scroll animation. */
+.render-mode .desk .tilt { animation: none; transform: none; }
+.render-mode .desk .slot::before { display: none; }
+.render-mode .reveal { animation: none !important; }
 </style>
 
 <header class="tabs wrap" role="banner">
   <div class="brand">
-    <svg viewBox="0 0 128 128" aria-hidden="true"><rect width="128" height="128" rx="28" fill="#0f172a"/><rect x="18" y="22" width="92" height="84" rx="12" fill="#1e293b"/><circle cx="30" cy="34" r="3.5" fill="#475569"/><circle cx="41" cy="34" r="3.5" fill="#475569"/><circle cx="52" cy="34" r="3.5" fill="#475569"/><rect x="28" y="48" width="44" height="5" rx="2.5" fill="#334155"/><rect x="28" y="59" width="62" height="5" rx="2.5" fill="#334155"/><path d="M18 84h92v10a12 12 0 0 1-12 12H30a12 12 0 0 1-12-12z" fill="#2563eb"/><rect x="26" y="90" width="34" height="9" rx="4.5" fill="#fff"/><circle cx="98" cy="94.5" r="4" fill="#fff" opacity=".85"/></svg>
+    <svg viewBox="0 0 128 128" aria-hidden="true"><rect width="128" height="128" rx="28" fill="#0f172a"/><rect x="18" y="22" width="92" height="84" rx="12" fill="#1e293b"/><circle cx="30" cy="34" r="3.5" fill="#475569"/><circle cx="41" cy="34" r="3.5" fill="#475569"/><circle cx="52" cy="34" r="3.5" fill="#475569"/><rect x="28" y="48" width="44" height="5" rx="2.5" fill="#334155"/><rect x="28" y="59" width="62" height="5" rx="2.5" fill="#334155"/><path d="M18 84h92v10a12 12 0 0 1-12 12H30a12 12 0 0 1-12-12z" fill="#216de8"/><rect x="26" y="90" width="34" height="9" rx="4.5" fill="#fff"/><circle cx="98" cy="94.5" r="4" fill="#fff" opacity=".85"/></svg>
     Nameplate
   </div>
   <div class="tablist" role="tablist" aria-label="Page">
@@ -443,6 +502,7 @@ pre.block { margin: 0; background: var(--ground); border: 1px solid var(--line);
   <section class="hero">
     <div>
       <h1>Which project is this window?</h1>
+      <p class="answer" aria-hidden="true"><span class="tape"><span class="a1">Storefront</span><span class="a2">Billing API</span><span class="a3">Mobile App</span><span class="a4">?</span><span class="a5">Docs</span></span></p>
       <p class="lede">With a few VS Code windows open, they all look the same. <strong>Nameplate puts the project's name in the status bar and gives every project its own status bar color</strong>, so you can tell the windows apart at a glance, even the ones in the background.</p>
       <div class="cta">
         <a class="btn primary" href="https://marketplace.visualstudio.com/items?itemName=rowhitswami.nameplate">Visual Studio Marketplace</a>
@@ -453,40 +513,42 @@ pre.block { margin: 0; background: var(--ground); border: 1px solid var(--line);
       </div>
     </div>
     <div class="stage desk dark render-scene" data-scene="hero" role="img" aria-label="Four VS Code windows, first without Nameplate (all alike), then with a name and a different status bar color each">
-      <div class="win">
+      <div class="tilt">
+      <div class="slot" style="--c:#216de8;--t:#fff"><div class="win">
         <div class="titlebar"><span class="dots"><i></i><i></i><i></i></span><span class="t">cart.ts — storefront</span></div>
         <div class="body"><div class="activity"></div><div class="tree"><b style="width:80%"></b><b style="width:60%"></b><b style="width:70%"></b><b style="width:50%"></b><b style="width:66%"></b></div>
 <div class="code"><span class="k">export function</span> <span class="f">total</span>(items) {
   <span class="k">return</span> items.<span class="f">reduce</span>(
     (sum, item) =&gt; sum + item.price, <span class="n">0</span>)
 }</div></div>
-        <div class="sb" style="--c:#2563eb"><span class="name"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3h4l1.5 1.5h7.5v8.5h-13z"/></svg>STOREFRONT</span><span class="muted">⎇ main</span><span class="right">Ln 12, Col 4</span></div>
-      </div>
-      <div class="win">
+        <div class="sb"><span class="name"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3h4l1.5 1.5h7.5v8.5h-13z"/></svg>STOREFRONT</span><span class="muted">⎇ main</span><span class="right">Ln 12, Col 4</span></div>
+      </div></div>
+      <div class="slot" style="--c:#9051eb;--t:#fff"><div class="win">
         <div class="titlebar"><span class="dots"><i></i><i></i><i></i></span><span class="t">invoice.go — billing-api</span></div>
         <div class="body"><div class="activity"></div><div class="tree"><b style="width:70%"></b><b style="width:85%"></b><b style="width:55%"></b><b style="width:62%"></b></div>
 <div class="code"><span class="k">func</span> <span class="f">Issue</span>(c Customer) (*Invoice, <span class="k">error</span>) {
 	lines := c.<span class="f">OpenCharges</span>()
 	<span class="k">return</span> <span class="f">newInvoice</span>(c.ID, lines)
 }</div></div>
-        <div class="sb" style="--c:#7e22ce"><span class="name"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3h4l1.5 1.5h7.5v8.5h-13z"/></svg>BILLING API</span><span class="muted">⎇ fix/tax</span><span class="right">Go</span></div>
-      </div>
-      <div class="win">
+        <div class="sb"><span class="name"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3h4l1.5 1.5h7.5v8.5h-13z"/></svg>BILLING API</span><span class="muted">⎇ fix/tax</span><span class="right">Go</span></div>
+      </div></div>
+      <div class="slot" style="--c:#c3ea43;--t:#000"><div class="win">
         <div class="titlebar"><span class="dots"><i></i><i></i><i></i></span><span class="t">App.tsx — mobile-app</span></div>
         <div class="body"><div class="activity"></div><div class="tree"><b style="width:60%"></b><b style="width:75%"></b><b style="width:45%"></b></div>
 <div class="code"><span class="k">export default function</span> <span class="f">App</span>() {
   <span class="k">return</span> &lt;<span class="f">Navigation</span> /&gt;
 }</div></div>
-        <div class="sb" style="--c:#15803d"><span class="name"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3h4l1.5 1.5h7.5v8.5h-13z"/></svg>MOBILE APP</span><span class="muted">⎇ main</span><span class="right">TypeScript JSX</span></div>
-      </div>
-      <div class="win">
+        <div class="sb"><span class="name"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3h4l1.5 1.5h7.5v8.5h-13z"/></svg>MOBILE APP</span><span class="muted">⎇ main</span><span class="right">TypeScript JSX</span></div>
+      </div></div>
+      <div class="slot" style="--c:#c74b15;--t:#fff"><div class="win">
         <div class="titlebar"><span class="dots"><i></i><i></i><i></i></span><span class="t">index.md — docs</span></div>
         <div class="body"><div class="activity"></div><div class="tree"><b style="width:65%"></b><b style="width:50%"></b><b style="width:72%"></b><b style="width:58%"></b></div>
 <div class="code"><span class="k">#</span> Getting started
 
 Install the CLI, then run:
 <span class="s">`docs build --watch`</span></div></div>
-        <div class="sb" style="--c:#c2410c"><span class="name"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3h4l1.5 1.5h7.5v8.5h-13z"/></svg>DOCS</span><span class="muted">⎇ main</span><span class="right">Markdown</span></div>
+        <div class="sb"><span class="name"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3h4l1.5 1.5h7.5v8.5h-13z"/></svg>DOCS</span><span class="muted">⎇ main</span><span class="right">Markdown</span></div>
+      </div></div>
       </div>
       <div class="state"><span class="with">With Nameplate</span><span class="without">Without Nameplate</span></div>
     </div>
@@ -505,20 +567,20 @@ Install the CLI, then run:
     <div class="copytext">
       <h2>A name and a color for each project</h2>
       <p>The name comes from the project: the folder, <code>package.json</code>, Expo's <code>app.json</code>, <code>pyproject.toml</code>, <code>go.mod</code>, <code>Cargo.toml</code> or the Git remote. If one of them spells it with capitals, such as <strong>BrightDesk</strong>, that spelling is used.</p>
-      <p>The color is worked out from the Git remote, so the same repository has the same color on your laptop and your desktop. Red and yellow are left out of the automatic colors because they look like errors and warnings.</p>
+      <p>The color is worked out from the Git remote, so the same repository has the same color on your laptop and your desktop. The eleven automatic colors were picked so that every one of them looks clearly different from all the others. Red and yellow are left out because they look like errors and warnings.</p>
     </div>
-    <div class="tapes" role="list" aria-label="The eleven automatic colors">
-      <figure role="listitem"><span class="tape" style="--c:#2563eb">Storefront</span><figcaption>Blue #2563eb</figcaption></figure>
-      <figure role="listitem"><span class="tape" style="--c:#06b6d4;--t:#000">Docs</span><figcaption>Cyan #06b6d4</figcaption></figure>
-      <figure role="listitem"><span class="tape" style="--c:#0f766e">Infra</span><figcaption>Teal #0f766e</figcaption></figure>
-      <figure role="listitem"><span class="tape" style="--c:#15803d">Mobile App</span><figcaption>Green #15803d</figcaption></figure>
-      <figure role="listitem"><span class="tape" style="--c:#65a30d;--t:#000">Search</span><figcaption>Lime #65a30d</figcaption></figure>
-      <figure role="listitem"><span class="tape" style="--c:#c2410c">Website</span><figcaption>Orange #c2410c</figcaption></figure>
-      <figure role="listitem"><span class="tape" style="--c:#8a4513">Admin</span><figcaption>Brown #8a4513</figcaption></figure>
-      <figure role="listitem"><span class="tape" style="--c:#d41f6f">Analytics</span><figcaption>Pink #d41f6f</figcaption></figure>
-      <figure role="listitem"><span class="tape" style="--c:#a21caf">Auth</span><figcaption>Magenta #a21caf</figcaption></figure>
-      <figure role="listitem"><span class="tape" style="--c:#7e22ce">Billing API</span><figcaption>Purple #7e22ce</figcaption></figure>
-      <figure role="listitem"><span class="tape" style="--c:#4338ca">Design System</span><figcaption>Indigo #4338ca</figcaption></figure>
+    <div class="tapes reveal" role="list" aria-label="The eleven automatic colors">
+      <figure role="listitem"><span class="tape" style="--c:#216de8">Storefront</span><figcaption>Blue #216de8</figcaption></figure>
+      <figure role="listitem"><span class="tape" style="--c:#50dee9;--t:#000">Docs</span><figcaption>Cyan #50dee9</figcaption></figure>
+      <figure role="listitem"><span class="tape" style="--c:#158280">Infra</span><figcaption>Teal #158280</figcaption></figure>
+      <figure role="listitem"><span class="tape" style="--c:#0c6427">Mobile App</span><figcaption>Green #0c6427</figcaption></figure>
+      <figure role="listitem"><span class="tape" style="--c:#c3ea43;--t:#000">Search</span><figcaption>Lime #c3ea43</figcaption></figure>
+      <figure role="listitem"><span class="tape" style="--c:#c74b15">Website</span><figcaption>Orange #c74b15</figcaption></figure>
+      <figure role="listitem"><span class="tape" style="--c:#0a557d">Admin</span><figcaption>Ocean #0a557d</figcaption></figure>
+      <figure role="listitem"><span class="tape" style="--c:#c63a86">Analytics</span><figcaption>Pink #c63a86</figcaption></figure>
+      <figure role="listitem"><span class="tape" style="--c:#9212a4">Auth</span><figcaption>Magenta #9212a4</figcaption></figure>
+      <figure role="listitem"><span class="tape" style="--c:#9051eb">Billing API</span><figcaption>Purple #9051eb</figcaption></figure>
+      <figure role="listitem"><span class="tape" style="--c:#4132b9">Design System</span><figcaption>Indigo #4132b9</figcaption></figure>
     </div>
   </section>
 
@@ -528,13 +590,13 @@ Install the CLI, then run:
       <p>Start VS Code with five projects and each window gets a different color. The windows take turns: each one checks which colors are already on screen and picks one that looks clearly different. Colors are compared the way the eye sees them, so near-identical shades such as teal and green count as the same color.</p>
       <p>If two windows ever end up alike, the newer one changes color and shows a short message saying so.</p>
     </div>
-    <div class="stage coord dark render-scene" data-scene="coordinate" role="img" aria-label="Five windows open at the same moment; a lock visits each one in turn and each status bar takes a different color">
-      <div class="win"><div class="titlebar"><span class="dots"><i></i><i></i><i></i></span></div><div class="body"><div class="activity"></div><div class="lines"><b style="width:70%"></b><b style="width:85%"></b><b style="width:55%"></b><b style="width:78%"></b><b style="width:40%"></b><b style="width:66%"></b></div></div><div class="sb" style="--c:#d41f6f"><span class="name">STOREFRONT</span></div></div>
-      <div class="win"><div class="titlebar"><span class="dots"><i></i><i></i><i></i></span></div><div class="body"><div class="activity"></div><div class="lines"><b style="width:70%"></b><b style="width:85%"></b><b style="width:55%"></b><b style="width:78%"></b><b style="width:40%"></b><b style="width:66%"></b></div></div><div class="sb" style="--c:#06b6d4;--t:#000"><span class="name">BILLING API</span></div></div>
-      <div class="win"><div class="titlebar"><span class="dots"><i></i><i></i><i></i></span></div><div class="body"><div class="activity"></div><div class="lines"><b style="width:70%"></b><b style="width:85%"></b><b style="width:55%"></b><b style="width:78%"></b><b style="width:40%"></b><b style="width:66%"></b></div></div><div class="sb" style="--c:#8a4513"><span class="name">MOBILE APP</span></div></div>
-      <div class="win"><div class="titlebar"><span class="dots"><i></i><i></i><i></i></span></div><div class="body"><div class="activity"></div><div class="lines"><b style="width:70%"></b><b style="width:85%"></b><b style="width:55%"></b><b style="width:78%"></b><b style="width:40%"></b><b style="width:66%"></b></div></div><div class="sb" style="--c:#65a30d;--t:#000"><span class="name">DOCS</span></div></div>
-      <div class="win"><div class="titlebar"><span class="dots"><i></i><i></i><i></i></span></div><div class="body"><div class="activity"></div><div class="lines"><b style="width:70%"></b><b style="width:85%"></b><b style="width:55%"></b><b style="width:78%"></b><b style="width:40%"></b><b style="width:66%"></b></div></div><div class="sb" style="--c:#2563eb"><span class="name">ADMIN</span></div></div>
-      <span class="hex">#d41f6f</span><span class="hex">#06b6d4</span><span class="hex">#8a4513</span><span class="hex">#65a30d</span><span class="hex">#2563eb</span>
+    <div class="stage coord dark render-scene reveal" data-scene="coordinate" role="img" aria-label="Five windows open at the same moment; a lock visits each one in turn and each status bar takes a different color">
+      <div class="win"><div class="titlebar"><span class="dots"><i></i><i></i><i></i></span></div><div class="body"><div class="activity"></div><div class="lines"><b style="width:70%"></b><b style="width:85%"></b><b style="width:55%"></b><b style="width:78%"></b><b style="width:40%"></b><b style="width:66%"></b></div></div><div class="sb" style="--c:#c63a86"><span class="name">STOREFRONT</span></div></div>
+      <div class="win"><div class="titlebar"><span class="dots"><i></i><i></i><i></i></span></div><div class="body"><div class="activity"></div><div class="lines"><b style="width:70%"></b><b style="width:85%"></b><b style="width:55%"></b><b style="width:78%"></b><b style="width:40%"></b><b style="width:66%"></b></div></div><div class="sb" style="--c:#50dee9;--t:#000"><span class="name">BILLING API</span></div></div>
+      <div class="win"><div class="titlebar"><span class="dots"><i></i><i></i><i></i></span></div><div class="body"><div class="activity"></div><div class="lines"><b style="width:70%"></b><b style="width:85%"></b><b style="width:55%"></b><b style="width:78%"></b><b style="width:40%"></b><b style="width:66%"></b></div></div><div class="sb" style="--c:#0a557d"><span class="name">MOBILE APP</span></div></div>
+      <div class="win"><div class="titlebar"><span class="dots"><i></i><i></i><i></i></span></div><div class="body"><div class="activity"></div><div class="lines"><b style="width:70%"></b><b style="width:85%"></b><b style="width:55%"></b><b style="width:78%"></b><b style="width:40%"></b><b style="width:66%"></b></div></div><div class="sb" style="--c:#c3ea43;--t:#000"><span class="name">DOCS</span></div></div>
+      <div class="win"><div class="titlebar"><span class="dots"><i></i><i></i><i></i></span></div><div class="body"><div class="activity"></div><div class="lines"><b style="width:70%"></b><b style="width:85%"></b><b style="width:55%"></b><b style="width:78%"></b><b style="width:40%"></b><b style="width:66%"></b></div></div><div class="sb" style="--c:#216de8"><span class="name">ADMIN</span></div></div>
+      <span class="hex">#c63a86</span><span class="hex">#50dee9</span><span class="hex">#0a557d</span><span class="hex">#c3ea43</span><span class="hex">#216de8</span>
       <span class="lock"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4.5 7V5a3.5 3.5 0 0 1 7 0v2h1v7h-9V7zm1.5 0h4V5a2 2 0 0 0-4 0z"/></svg>registry.lock</span>
       <div class="caption"><span><b>5 windows</b> started within 120 ms</span><span>one at a time, <b>5 different colors</b></span></div>
     </div>
@@ -546,7 +608,7 @@ Install the CLI, then run:
       <p>Click the name to rename the project, pick a color with a live preview, add a label such as <strong>PROD</strong>, copy the path or the Git remote, or open the repository in the browser.</p>
       <p>These are ordinary VS Code menus, and every action is also in the Command Palette.</p>
     </div>
-    <div class="stage menu dark render-scene" data-scene="menu" role="img" aria-label="Clicking the project name opens a menu; choosing Change Project Color shows a palette and the status bar previews each color">
+    <div class="stage menu dark render-scene reveal" data-scene="menu" role="img" aria-label="Clicking the project name opens a menu; choosing Change Project Color shows a palette and the status bar previews each color">
       <div class="win">
         <div class="titlebar"><span class="dots"><i></i><i></i><i></i></span><span class="t">cart.ts — storefront</span></div>
         <div class="body"><div class="activity"></div><div class="tree"><b style="width:80%"></b><b style="width:60%"></b><b style="width:70%"></b><b style="width:50%"></b><b style="width:66%"></b><b style="width:40%"></b></div>
@@ -562,26 +624,26 @@ Install the CLI, then run:
         <div class="q-title">Storefront: Project Actions</div>
         <div class="q-input">Choose an action</div>
         <ul><span class="hl"></span>
-          <li>✎ Rename Project…<span class="d">Storefront</span></li>
-          <li>◐ Change Project Color…<span class="d">Blue (#2563eb)</span></li>
-          <li>⌗ Set Environment Label…<span class="d">none</span></li>
-          <li>↻ Regenerate Automatic Color</li>
-          <li>ⓘ Project Information</li>
+          <li><span class="ic">✎</span>Rename Project…<span class="d">Storefront</span></li>
+          <li><span class="ic">◐</span>Change Project Color…<span class="d">Blue (#216de8)</span></li>
+          <li><span class="ic">⌗</span>Set Environment Label…<span class="d">none</span></li>
+          <li><span class="ic">↻</span>Regenerate Automatic Color<span class="d"></span></li>
+          <li><span class="ic">ⓘ</span>Project Information<span class="d"></span></li>
         </ul>
       </div>
       <div class="qp colors">
         <div class="q-title">Color for Storefront</div>
         <div class="q-input">Pick a status bar color</div>
         <ul><span class="hl"></span>
-          <li><i style="background:#2563eb"></i>Automatic<span class="d">Blue, current</span></li>
-          <li><i style="background:#0f766e"></i>Teal<span class="d">#0f766e</span></li>
-          <li><i style="background:#15803d"></i>Green<span class="d">#15803d</span></li>
-          <li><i style="background:#7e22ce"></i>Purple<span class="d">#7e22ce</span></li>
-          <li><i style="background:#c2410c"></i>Orange<span class="d">#c2410c</span></li>
+          <li><span class="ic"><i class="sw" style="background:#216de8"></i></span>Automatic<span class="d">Blue, current</span></li>
+          <li><span class="ic"><i class="sw" style="background:#158280"></i></span>Teal<span class="d">#158280</span></li>
+          <li><span class="ic"><i class="sw" style="background:#0c6427"></i></span>Green<span class="d">#0c6427</span></li>
+          <li><span class="ic"><i class="sw" style="background:#9051eb"></i></span>Purple<span class="d">#9051eb</span></li>
+          <li><span class="ic"><i class="sw" style="background:#c74b15"></i></span>Orange<span class="d">#c74b15</span></li>
         </ul>
       </div>
       <svg class="pointer" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 2l14 12-6.2.8L16 22l-3 1.2-3.2-7.4L5 20z" fill="#fff" stroke="#111" stroke-width="1.2" stroke-linejoin="round"/></svg>
-      <span class="toast">Storefront is now purple</span>
+      <span class="toast">✓ Storefront is now purple</span>
     </div>
   </section>
 
@@ -591,7 +653,7 @@ Install the CLI, then run:
       <p>VS Code keeps a window's colors in the project's <code>.vscode/settings.json</code>, and many projects commit that file. Nameplate adds a small local Git filter for it, so Git reads the file without Nameplate's lines.</p>
       <p><code>git status</code> stays clean, the colors never end up in a commit, and your own edits to the file show up as usual. There is nothing to set up, and Nameplate removes the filter when it stops coloring the project.</p>
     </div>
-    <div class="stage gitstage dark render-scene" data-scene="git" role="img" aria-label="An editor shows Nameplate's color lines in settings.json; a terminal shows git status clean, and after an edit, git diff shows only that edit">
+    <div class="stage gitstage dark render-scene reveal" data-scene="git" role="img" aria-label="An editor shows Nameplate's color lines in settings.json; a terminal shows git status clean, and after an edit, git diff shows only that edit">
       <div class="win editor">
         <div class="titlebar"><span class="dots"><i></i><i></i><i></i></span><span class="t">.vscode/settings.json — infra</span></div>
         <div class="body" style="grid-template-columns: 3.2cqw 1fr"><div class="activity"></div>
@@ -600,11 +662,11 @@ Install the CLI, then run:
     <span class="s">"source.fixAll"</span>: <span class="swap"><span class="a s">"explicit"</span><span class="b s">"always"</span></span>
   },
 <span class="band"><span class="tag">added by Nameplate, hidden from Git</span>  <span class="s">"workbench.colorCustomizations"</span>: {
-    <span class="s">"statusBar.background"</span>: <span class="s">"#0f766e"</span>,
+    <span class="s">"statusBar.background"</span>: <span class="s">"#158280"</span>,
     <span class="s">"statusBar.foreground"</span>: <span class="s">"#ffffff"</span>
   }</span>
 }</div></div>
-        <div class="sb" style="--c:#0f766e"><span class="name"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3h4l1.5 1.5h7.5v8.5h-13z"/></svg>INFRA</span><span class="muted">⎇ main</span><span class="right">JSON with Comments</span></div>
+        <div class="sb" style="--c:#158280"><span class="name"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3h4l1.5 1.5h7.5v8.5h-13z"/></svg>INFRA</span><span class="muted">⎇ main</span><span class="right">JSON with Comments</span></div>
       </div>
       <div class="win term">
         <div class="titlebar"><span class="dots"><i></i><i></i><i></i></span><span class="t">Terminal: zsh</span></div>
@@ -626,49 +688,62 @@ Install the CLI, then run:
       <h2>Runs in your editor</h2>
       <div class="prose"><p>Nameplate uses only the standard extension API, so it runs in VS Code and in the editors built on it. Editors that can't use Microsoft's Marketplace install it from Open VSX.</p></div>
     </div>
-    <ul class="editor-grid">
+    <ul class="editor-grid reveal">
       <li class="ed">
-        <div class="ed-win" aria-hidden="true"><div class="tb"><i></i><i></i><i></i></div><div class="lines"><b style="width:70%"></b><b style="width:52%"></b><b style="width:82%"></b><b style="width:40%"></b></div><div class="bar" style="--c:#2563eb;--t:#fff;--i:0"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3h4l1.5 1.5h7.5v8.5h-13z"/></svg>VS CODE</div></div>
+        <div class="ed-win" aria-hidden="true"><div class="tb"><i></i><i></i><i></i></div><div class="lines"><b style="width:70%"></b><b style="width:52%"></b><b style="width:82%"></b><b style="width:40%"></b></div><div class="bar" style="--c:#216de8;--t:#fff;--i:0"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3h4l1.5 1.5h7.5v8.5h-13z"/></svg>VS CODE</div></div>
         <div class="ed-meta"><strong>VS Code</strong><span>Microsoft</span></div>
         <span class="reg">Visual Studio Marketplace</span>
       </li>
       <li class="ed">
-        <div class="ed-win" aria-hidden="true"><div class="tb"><i></i><i></i><i></i></div><div class="lines"><b style="width:70%"></b><b style="width:52%"></b><b style="width:82%"></b><b style="width:40%"></b></div><div class="bar" style="--c:#7e22ce;--t:#fff;--i:1"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3h4l1.5 1.5h7.5v8.5h-13z"/></svg>CURSOR</div></div>
+        <div class="ed-win" aria-hidden="true"><div class="tb"><i></i><i></i><i></i></div><div class="lines"><b style="width:70%"></b><b style="width:52%"></b><b style="width:82%"></b><b style="width:40%"></b></div><div class="bar" style="--c:#9051eb;--t:#fff;--i:1"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3h4l1.5 1.5h7.5v8.5h-13z"/></svg>CURSOR</div></div>
         <div class="ed-meta"><strong>Cursor</strong><span>Anysphere</span></div>
         <span class="reg">Open VSX</span>
       </li>
       <li class="ed">
-        <div class="ed-win" aria-hidden="true"><div class="tb"><i></i><i></i><i></i></div><div class="lines"><b style="width:70%"></b><b style="width:52%"></b><b style="width:82%"></b><b style="width:40%"></b></div><div class="bar" style="--c:#0f766e;--t:#fff;--i:2"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3h4l1.5 1.5h7.5v8.5h-13z"/></svg>WINDSURF</div></div>
+        <div class="ed-win" aria-hidden="true"><div class="tb"><i></i><i></i><i></i></div><div class="lines"><b style="width:70%"></b><b style="width:52%"></b><b style="width:82%"></b><b style="width:40%"></b></div><div class="bar" style="--c:#158280;--t:#fff;--i:2"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3h4l1.5 1.5h7.5v8.5h-13z"/></svg>WINDSURF</div></div>
         <div class="ed-meta"><strong>Windsurf</strong><span>Cognition</span></div>
         <span class="reg">Open VSX</span>
       </li>
       <li class="ed">
-        <div class="ed-win" aria-hidden="true"><div class="tb"><i></i><i></i><i></i></div><div class="lines"><b style="width:70%"></b><b style="width:52%"></b><b style="width:82%"></b><b style="width:40%"></b></div><div class="bar" style="--c:#c2410c;--t:#fff;--i:3"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3h4l1.5 1.5h7.5v8.5h-13z"/></svg>ANTIGRAVITY</div></div>
+        <div class="ed-win" aria-hidden="true"><div class="tb"><i></i><i></i><i></i></div><div class="lines"><b style="width:70%"></b><b style="width:52%"></b><b style="width:82%"></b><b style="width:40%"></b></div><div class="bar" style="--c:#c74b15;--t:#fff;--i:3"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3h4l1.5 1.5h7.5v8.5h-13z"/></svg>ANTIGRAVITY</div></div>
         <div class="ed-meta"><strong>Antigravity</strong><span>Google</span></div>
         <span class="reg">Open VSX</span>
       </li>
       <li class="ed">
-        <div class="ed-win" aria-hidden="true"><div class="tb"><i></i><i></i><i></i></div><div class="lines"><b style="width:70%"></b><b style="width:52%"></b><b style="width:82%"></b><b style="width:40%"></b></div><div class="bar" style="--c:#d41f6f;--t:#fff;--i:4"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3h4l1.5 1.5h7.5v8.5h-13z"/></svg>KIRO</div></div>
+        <div class="ed-win" aria-hidden="true"><div class="tb"><i></i><i></i><i></i></div><div class="lines"><b style="width:70%"></b><b style="width:52%"></b><b style="width:82%"></b><b style="width:40%"></b></div><div class="bar" style="--c:#c63a86;--t:#fff;--i:4"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3h4l1.5 1.5h7.5v8.5h-13z"/></svg>KIRO</div></div>
         <div class="ed-meta"><strong>Kiro</strong><span>Amazon Web Services</span></div>
         <span class="reg">Open VSX</span>
       </li>
       <li class="ed">
-        <div class="ed-win" aria-hidden="true"><div class="tb"><i></i><i></i><i></i></div><div class="lines"><b style="width:70%"></b><b style="width:52%"></b><b style="width:82%"></b><b style="width:40%"></b></div><div class="bar" style="--c:#15803d;--t:#fff;--i:5"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3h4l1.5 1.5h7.5v8.5h-13z"/></svg>POSITRON</div></div>
+        <div class="ed-win" aria-hidden="true"><div class="tb"><i></i><i></i><i></i></div><div class="lines"><b style="width:70%"></b><b style="width:52%"></b><b style="width:82%"></b><b style="width:40%"></b></div><div class="bar" style="--c:#0c6427;--t:#fff;--i:5"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3h4l1.5 1.5h7.5v8.5h-13z"/></svg>POSITRON</div></div>
         <div class="ed-meta"><strong>Positron</strong><span>Posit</span></div>
         <span class="reg">Open VSX</span>
       </li>
       <li class="ed">
-        <div class="ed-win" aria-hidden="true"><div class="tb"><i></i><i></i><i></i></div><div class="lines"><b style="width:70%"></b><b style="width:52%"></b><b style="width:82%"></b><b style="width:40%"></b></div><div class="bar" style="--c:#4338ca;--t:#fff;--i:6"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3h4l1.5 1.5h7.5v8.5h-13z"/></svg>VSCODIUM</div></div>
+        <div class="ed-win" aria-hidden="true"><div class="tb"><i></i><i></i><i></i></div><div class="lines"><b style="width:70%"></b><b style="width:52%"></b><b style="width:82%"></b><b style="width:40%"></b></div><div class="bar" style="--c:#4132b9;--t:#fff;--i:6"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3h4l1.5 1.5h7.5v8.5h-13z"/></svg>VSCODIUM</div></div>
         <div class="ed-meta"><strong>VSCodium</strong><span>VSCodium project</span></div>
         <span class="reg">Open VSX</span>
       </li>
       <li class="ed">
-        <div class="ed-win" aria-hidden="true"><div class="tb"><i></i><i></i><i></i></div><div class="lines"><b style="width:70%"></b><b style="width:52%"></b><b style="width:82%"></b><b style="width:40%"></b></div><div class="bar" style="--c:#06b6d4;--t:#000;--i:7"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3h4l1.5 1.5h7.5v8.5h-13z"/></svg>TRAE</div></div>
+        <div class="ed-win" aria-hidden="true"><div class="tb"><i></i><i></i><i></i></div><div class="lines"><b style="width:70%"></b><b style="width:52%"></b><b style="width:82%"></b><b style="width:40%"></b></div><div class="bar" style="--c:#50dee9;--t:#000;--i:7"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3h4l1.5 1.5h7.5v8.5h-13z"/></svg>TRAE</div></div>
         <div class="ed-meta"><strong>Trae</strong><span>ByteDance</span></div>
         <span class="reg">.vsix file</span>
       </li>
     </ul>
     <p class="foot">Any editor based on VS Code 1.85 or later can install the <code>.vsix</code> from the GitHub releases page (Extensions view, Install from VSIX). Remote windows over SSH, WSL and Dev Containers work too.</p>
+  </section>
+
+  <section class="faq" id="questions">
+    <h2>Questions</h2>
+    <div class="qa">
+      <div><h3>How can I tell VS Code windows apart?</h3><p>Give every project its own status bar color and show its name. Nameplate does both automatically. It reads the project name from the folder, <code>package.json</code> or the Git remote, and gives each project a color that looks different from the other open windows.</p></div>
+      <div><h3>How do I change the status bar color for one project?</h3><p>VS Code reads <code>workbench.colorCustomizations</code> from the project's <code>.vscode/settings.json</code> and applies it to that window only. Nameplate writes the status bar colors there for you, picks a readable text color, and lets you choose another color by clicking the project name.</p></div>
+      <div><h3>Will it change files in my Git repository?</h3><p>The colors have to be in <code>.vscode/settings.json</code>, but Git never sees them. A settings file Nameplate creates is listed in <code>.git/info/exclude</code>, and in a settings file you commit, a local Git filter hides Nameplate's lines. Nothing shows up in <code>git status</code> or in a commit.</p></div>
+      <div><h3>Does it work in Cursor, Windsurf, Antigravity or Kiro?</h3><p>Yes. Nameplate uses the standard extension API. Cursor, Windsurf, Antigravity, Kiro, Positron and VSCodium install it from Open VSX, and VS Code installs it from the Visual Studio Marketplace.</p></div>
+      <div><h3>How is it different from Peacock?</h3><p>Peacock colors the title bar, activity bar and status bar with colors you choose and stores them in the workspace settings. Nameplate picks colors automatically, adds the project name, keeps open windows from sharing a color, and keeps the settings out of Git. You can use both; Nameplate leaves colors set by Peacock alone.</p></div>
+      <div><h3>Does it collect any data?</h3><p>No. Nameplate makes no network requests and has no telemetry. Everything it stores stays in VS Code's storage on your computer.</p></div>
+      <div><h3>Is it free?</h3><p>Yes. Nameplate is free and open source under the MIT license.</p></div>
+    </div>
   </section>
 
   <section class="notes">

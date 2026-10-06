@@ -38,8 +38,8 @@ const vsix =
   `nameplate-${JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')).version}.vsix`;
 const upgradeTo = option('--upgrade-to');
 const keep = args.includes('--keep');
-// Six repository names whose canonical colors are identical (all pink in 0.1.0).
-const names = (option('--names') ?? 'demo-26,demo-27,demo-51,demo-63,demo-75,demo-90').split(',');
+// Six repository names whose canonical colors are identical (the worst case).
+const names = (option('--names') ?? 'demo-0,demo-3,demo-8,demo-10,demo-23,demo-36').split(',');
 if (!existsSync(vsix)) {
   console.error(
     `${vsix} not found. Run "npm run package" first, or pass --vsix <file> [--upgrade-to <file>] [--keep].`,

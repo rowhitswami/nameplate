@@ -58,7 +58,7 @@ export const MAX_OPEN_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 /** `lastSeen` is refreshed at most this often, to avoid needless writes. */
 export const LAST_SEEN_REFRESH_MS = 10 * 60 * 1000;
 export const MAX_REGISTRY_ENTRIES = 200;
-const FALLBACK_COLOR = '#2563eb';
+const FALLBACK_COLOR = '#216de8';
 
 export type IsAlive = (pid: number) => boolean;
 type Keyed = readonly [key: string, entry: RegistryEntry];

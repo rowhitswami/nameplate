@@ -24,7 +24,7 @@ const shapes = [
   { kind: 'rrect', x: 28, y: 59, w: 62, h: 5, r: 2.5, fill: '#334155' },
   { kind: 'rrect', x: 28, y: 70, w: 36, h: 5, r: 2.5, fill: '#334155' },
   // Status bar: square top corners, rounded bottom corners.
-  { kind: 'rrect', x: 18, y: 84, w: 92, h: 22, r: 12, fill: '#2563eb', squareTop: true },
+  { kind: 'rrect', x: 18, y: 84, w: 92, h: 22, r: 12, fill: '#216de8', squareTop: true },
   { kind: 'rrect', x: 26, y: 90, w: 34, h: 9, r: 4.5, fill: '#ffffff' },
   { kind: 'circle', cx: 98, cy: 94.5, r: 4, fill: '#ffffff', alpha: 0.85 },
 ];

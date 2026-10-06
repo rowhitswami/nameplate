@@ -53,7 +53,7 @@ export async function pickProjectColor(
     {
       action: 'custom',
       label: '$(edit) Custom Color…',
-      description: 'Enter a hex value such as #2563eb',
+      description: 'Enter a hex value such as #216de8',
     },
   ];
 
@@ -145,14 +145,14 @@ export async function pickProjectColor(
 export async function promptForHexColor(current: string): Promise<string | undefined> {
   const value = await vscode.window.showInputBox({
     title: 'Custom Project Color',
-    prompt: 'Hex color, e.g. #2563eb or #26e',
+    prompt: 'Hex color, e.g. #216de8 or #26e',
     value: current,
     valueSelection: [1, current.length],
     validateInput: (input): vscode.InputBoxValidationMessage | undefined => {
       const hex = normalizeHexColor(input);
       if (!hex) {
         return {
-          message: 'Enter a hex color such as #2563eb (3 or 6 hex digits).',
+          message: 'Enter a hex color such as #216de8 (3 or 6 hex digits).',
           severity: vscode.InputBoxValidationSeverity.Error,
         };
       }

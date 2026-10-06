@@ -117,29 +117,29 @@ describe('palette', () => {
 
   it('freezes the automatic palette (changing it would recolor existing projects)', () => {
     assert.deepEqual(AUTO_PALETTE, [
-      '#2563eb',
-      '#06b6d4',
-      '#0f766e',
-      '#15803d',
-      '#65a30d',
-      '#c2410c',
-      '#8a4513',
-      '#d41f6f',
-      '#a21caf',
-      '#7e22ce',
-      '#4338ca',
+      '#216de8',
+      '#4132b9',
+      '#9051eb',
+      '#9212a4',
+      '#c63a86',
+      '#c74b15',
+      '#c3ea43',
+      '#0c6427',
+      '#158280',
+      '#50dee9',
+      '#0a557d',
     ]);
   });
 
   it('keeps warning/error-like colors out of automatic assignment', () => {
-    assert.equal(findPaletteColor('#c81e1e')?.auto, false);
-    assert.equal(findPaletteColor('#ca8a04')?.auto, false);
+    assert.equal(findPaletteColor('#d02c2a')?.auto, false);
+    assert.equal(findPaletteColor('#f5af24')?.auto, false);
   });
 
   it('describes colors', () => {
-    assert.equal(describeColor('#2563EB'), 'Blue (#2563eb)');
+    assert.equal(describeColor('#216DE8'), 'Blue (#216de8)');
     assert.equal(describeColor('#123456'), '#123456');
-    assert.equal(colorDisplayName('#2563eb'), 'Blue');
+    assert.equal(colorDisplayName('#216de8'), 'Blue');
     assert.equal(colorDisplayName('#123456'), '#123456');
     assert.equal(findPaletteColor('nope'), undefined);
   });

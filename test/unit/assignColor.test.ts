@@ -47,9 +47,9 @@ describe('automatic color choice', () => {
 
   it('pins known keys to known colors (regression anchor for the hashing scheme)', () => {
     // If this test fails, the automatic color of every existing project changed.
-    assert.equal(canonicalColor('git:github.com/acme/brightdesk', palette), '#8a4513');
-    assert.equal(canonicalColor('git:github.com/acme/trailmix', palette), '#15803d');
-    assert.equal(canonicalColor('path:file:///Users/me/code/demo', palette), '#2563eb');
+    assert.equal(canonicalColor('git:github.com/acme/brightdesk', palette), '#c3ea43');
+    assert.equal(canonicalColor('git:github.com/acme/trailmix', palette), '#9212a4');
+    assert.equal(canonicalColor('path:file:///Users/me/code/demo', palette), '#216de8');
   });
 
   it('spreads different keys over the whole palette', () => {
@@ -76,7 +76,7 @@ describe('automatic color choice', () => {
   });
 
   it('skips near-duplicates, not only identical colors', () => {
-    // Green is open: teal (ΔE 0.086) and lime (0.136 but recent) must not win over a clearly different color.
+    // A green window is open: any similar shade must lose to a clearly different color.
     const chosen = chooseAutoColor({ key: 'k-green', palette, open: ['#15803d'] }) ?? '';
     assert.ok(colorDistance(chosen, '#15803d') >= PREFERRED_DISTANCE, chosen);
   });
@@ -90,16 +90,14 @@ describe('automatic color choice', () => {
   });
 
   it('accepts the minimum separation before giving up', () => {
-    // Make every candidate fail the preferred distance but keep one above the minimum.
-    const target = '#2563eb'; // blue: indigo is 0.104 away
-    const open = palette.filter(
-      (c) => c !== '#4338ca' && colorDistance(c, '#4338ca') >= PREFERRED_DISTANCE,
-    );
-    open.push(target);
-    const chosen = chooseAutoColor({ key, palette, open }) ?? '';
-    for (const color of open) {
-      assert.ok(colorDistance(chosen, color) >= MIN_DISTINCT_DISTANCE, `${chosen} vs ${color}`);
-    }
+    // Greys differ only in lightness, which makes the distances easy to control.
+    const open = ['#636363'];
+    const near = '#727272'; // too close to the open window
+    const fair = '#848484'; // distinct, but closer than the preferred distance
+    assert.ok(colorDistance(near, '#636363') < MIN_DISTINCT_DISTANCE);
+    const distance = colorDistance(fair, '#636363');
+    assert.ok(distance >= MIN_DISTINCT_DISTANCE && distance < PREFERRED_DISTANCE, String(distance));
+    assert.equal(chooseAutoColor({ key, palette: [near, fair], open }), fair);
   });
 
   it('falls back to the most distinct color when the palette is exhausted', () => {

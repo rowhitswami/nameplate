@@ -4,6 +4,13 @@ All notable changes to Nameplate are documented here. The format follows [Keep a
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-06
+
+### Changed
+
+- A new, modern color palette designed in OKLCH. Every one of the eleven automatic colors now looks clearly different from all the others, so up to eleven open windows can be told apart (up from about nine), and the dated brown and olive shades are gone. Projects get a new automatic color once.
+- The color picker offers Blue, Indigo, Purple, Magenta, Pink, Orange, Lime, Green, Teal, Cyan and Ocean, plus Red, Yellow and Slate.
+
 ## [0.2.0] - 2026-10-06
 
 ### Changed

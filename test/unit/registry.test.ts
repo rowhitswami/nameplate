@@ -24,8 +24,8 @@ import {
 
 const NOW = 1_800_000_000_000;
 const palette = AUTO_PALETTE;
-/** Six keys whose canonical colors are identical (all pink): the worst case. */
-const COLLIDING = ['demo-26', 'demo-27', 'demo-51', 'demo-63', 'demo-75', 'demo-90'].map(
+/** Six keys whose canonical colors are identical: the worst case. */
+const COLLIDING = ['demo-0', 'demo-3', 'demo-8', 'demo-10', 'demo-23', 'demo-36'].map(
   (name) => `git:github.com/acme/${name}`,
 );
 
@@ -89,11 +89,11 @@ describe('color registry: claims', () => {
   it('keeps a pinned color when no open window looks the same', () => {
     const result = planClaim(
       EMPTY_REGISTRY,
-      { key: 'k', name: 'K', pid: 1, pinned: { key: 'k', color: '#7e22ce' } },
+      { key: 'k', name: 'K', pid: 1, pinned: { key: 'k', color: '#9051eb' } },
       context([1]),
     );
     assert.equal(result.reason, 'pinned');
-    assert.equal(result.auto, '#7e22ce');
+    assert.equal(result.auto, '#9051eb');
     assert.equal(result.changed, true);
     assert.deepEqual(result.registry.entries['k']?.pids, [1]);
   });
@@ -102,25 +102,27 @@ describe('color registry: claims', () => {
     const registry = registryOf({
       other: entry({
         name: 'Other',
-        color: '#d41f6f',
-        auto: '#d41f6f',
+        color: '#c63a86',
+        auto: '#c63a86',
         pids: [2],
         claimedAt: NOW - 5000,
       }),
     });
     const result = planClaim(
       registry,
-      { key: 'me', name: 'Me', pid: 1, pinned: { key: 'me', color: '#d41f6f' } },
+      { key: 'me', name: 'Me', pid: 1, pinned: { key: 'me', color: '#c63a86' } },
       context([1, 2]),
     );
     assert.equal(result.reason, 'moved');
-    assert.equal(result.movedFrom, '#d41f6f');
+    assert.equal(result.movedFrom, '#c63a86');
     assert.equal(result.conflictWith, 'Other');
-    assert.ok(colorDistance(result.auto, '#d41f6f') >= MIN_DISTINCT_DISTANCE);
+    assert.ok(colorDistance(result.auto, '#c63a86') >= MIN_DISTINCT_DISTANCE);
     assert.equal(result.registry.entries['me']?.claimedAt, NOW);
   });
 
   it('keeps its color when it has priority, also against near-duplicates', () => {
+    // The built-in palette has no near-twins, so this uses one that does (green and teal, ΔE 0.086).
+    const twins = { palette: ['#15803d', '#0f766e', ...palette] };
     const registry = registryOf({
       me: entry({ color: '#15803d', auto: '#15803d', pids: [1], claimedAt: NOW - 9000 }),
       other: entry({ color: '#0f766e', auto: '#0f766e', pids: [2], claimedAt: NOW - 5000 }),
@@ -128,27 +130,27 @@ describe('color registry: claims', () => {
     const mine = planClaim(
       registry,
       { key: 'me', name: 'Me', pid: 1, pinned: { key: 'me', color: '#15803d' } },
-      context([1, 2]),
+      context([1, 2], twins),
     );
     assert.equal(mine.reason, 'pinned');
     // The younger window with the near-duplicate teal moves instead.
     const theirs = planClaim(
       registry,
       { key: 'other', name: 'Other', pid: 2, pinned: { key: 'other', color: '#0f766e' } },
-      context([1, 2]),
+      context([1, 2], twins),
     );
     assert.equal(theirs.reason, 'moved');
   });
 
   it('ignores windows that are closed, uncolored or showing nothing', () => {
     const registry = registryOf({
-      closed: entry({ color: '#d41f6f', pids: [7] }),
-      hidden: entry({ color: '#d41f6f', pids: [2], visible: false }),
-      ancient: entry({ color: '#d41f6f', pids: [2], lastSeen: NOW - MAX_OPEN_AGE_MS - 1 }),
+      closed: entry({ color: '#c63a86', pids: [7] }),
+      hidden: entry({ color: '#c63a86', pids: [2], visible: false }),
+      ancient: entry({ color: '#c63a86', pids: [2], lastSeen: NOW - MAX_OPEN_AGE_MS - 1 }),
     });
     const result = planClaim(
       registry,
-      { key: 'me', name: 'Me', pid: 1, pinned: { key: 'me', color: '#d41f6f' } },
+      { key: 'me', name: 'Me', pid: 1, pinned: { key: 'me', color: '#c63a86' } },
       context([1, 2]),
     );
     assert.equal(result.reason, 'pinned');
@@ -156,28 +158,28 @@ describe('color registry: claims', () => {
 
   it('treats custom and foreign (Peacock) colors as fixed: automatic windows move away from them', () => {
     const registry = registryOf({
-      peacock: entry({ color: '#a21caf', external: '#dd0531', pids: [2], claimedAt: NOW }),
-      custom: entry({ color: '#2563eb', custom: true, pids: [3], claimedAt: NOW }),
+      peacock: entry({ color: '#9212a4', external: '#dd0531', pids: [2], claimedAt: NOW }),
+      custom: entry({ color: '#216de8', custom: true, pids: [3], claimedAt: NOW }),
     });
     const nearRed = planClaim(
       registry,
-      { key: 'me', name: 'Me', pid: 1, pinned: { key: 'me', color: '#d41f6f' } },
+      { key: 'me', name: 'Me', pid: 1, pinned: { key: 'me', color: '#c74b15' } },
       context([1, 2, 3]),
     );
-    assert.equal(nearRed.reason, 'moved'); // pink looks like the Peacock red
+    assert.equal(nearRed.reason, 'moved'); // orange looks like the Peacock red
     const nearBlue = planClaim(
       registry,
-      { key: 'me', name: 'Me', pid: 1, pinned: { key: 'me', color: '#2563eb' } },
+      { key: 'me', name: 'Me', pid: 1, pinned: { key: 'me', color: '#216de8' } },
       context([1, 2, 3]),
     );
     assert.equal(nearBlue.reason, 'moved');
     // A custom color itself never moves.
     const custom = planClaim(
       registry,
-      { key: 'me', name: 'Me', pid: 1, customColor: '#2563eb' },
+      { key: 'me', name: 'Me', pid: 1, customColor: '#216de8' },
       context([1, 2, 3]),
     );
-    assert.equal(custom.active, '#2563eb');
+    assert.equal(custom.active, '#216de8');
     assert.equal(custom.registry.entries['me']?.custom, true);
   });
 
@@ -196,17 +198,17 @@ describe('color registry: claims', () => {
   });
 
   it('reuses the color a key already has on this machine, and carries a color over when the key changes', () => {
-    const registry = registryOf({ 'git:x': entry({ color: '#7e22ce', auto: '#7e22ce' }) });
+    const registry = registryOf({ 'git:x': entry({ color: '#9051eb', auto: '#9051eb' }) });
     const clone = planClaim(registry, { key: 'git:x', name: 'X', pid: 1 }, context([1]));
     assert.equal(clone.reason, 'known');
-    assert.equal(clone.auto, '#7e22ce');
+    assert.equal(clone.auto, '#9051eb');
     const renamed = planClaim(
       EMPTY_REGISTRY,
-      { key: 'git:new', name: 'X', pid: 1, pinned: { key: 'path:old', color: '#0f766e' } },
+      { key: 'git:new', name: 'X', pid: 1, pinned: { key: 'path:old', color: '#158280' } },
       context([1]),
     );
     assert.equal(renamed.reason, 'carried-over');
-    assert.equal(renamed.auto, '#0f766e');
+    assert.equal(renamed.auto, '#158280');
   });
 
   it('regenerates to the next distinct color in the key order', () => {
@@ -249,7 +251,7 @@ describe('color registry: claims', () => {
   });
 
   it('drops dead process ids and records its own', () => {
-    const registry = registryOf({ k: entry({ color: '#7e22ce', auto: '#7e22ce', pids: [5, 6] }) });
+    const registry = registryOf({ k: entry({ color: '#9051eb', auto: '#9051eb', pids: [5, 6] }) });
     const result = planClaim(registry, { key: 'k', name: 'K', pid: 1 }, context([1, 6]));
     assert.deepEqual(result.registry.entries['k']?.pids, [6, 1]);
   });
@@ -260,19 +262,19 @@ describe('color registry: convergence', () => {
     // Version 0.1.0 left three windows pink and two brown. Each window re-claims
     // with its pinned color, in some order; then every window re-checks until stable.
     const pinned: Record<string, string> = {
-      'git:github.com/acme/storefront': '#d41f6f',
-      'git:github.com/acme/billing-api': '#d41f6f',
-      'path:file:///Users/me/code/notes': '#d41f6f',
-      'git:github.com/acme/mobile-app': '#8a4513',
-      'git:github.com/acme/admin': '#8a4513',
-      'git:github.com/acme/docs': '#06b6d4',
+      'git:github.com/acme/storefront': '#c63a86',
+      'git:github.com/acme/billing-api': '#c63a86',
+      'path:file:///Users/me/code/notes': '#c63a86',
+      'git:github.com/acme/mobile-app': '#0a557d',
+      'git:github.com/acme/admin': '#0a557d',
+      'git:github.com/acme/docs': '#50dee9',
     };
     const keys = Object.keys(pinned);
     const alive = [...keys.map((_, i) => i + 1), 99];
     // The Peacock-colored website window shows red and never moves.
     let registry = registryOf({
       'git:github.com/acme/website': entry({
-        color: '#a21caf',
+        color: '#9212a4',
         external: '#dd0531',
         pids: [99],
       }),
@@ -300,8 +302,8 @@ describe('color registry: convergence', () => {
 
   it('flags exactly the window that has to move', () => {
     const registry = registryOf({
-      old: entry({ color: '#d41f6f', auto: '#d41f6f', pids: [1], claimedAt: NOW - 9000 }),
-      young: entry({ color: '#d41f6f', auto: '#d41f6f', pids: [2], claimedAt: NOW - 1000 }),
+      old: entry({ color: '#c63a86', auto: '#c63a86', pids: [1], claimedAt: NOW - 9000 }),
+      young: entry({ color: '#c63a86', auto: '#c63a86', pids: [2], claimedAt: NOW - 1000 }),
     });
     assert.equal(needsReassignment(registry, 'old', 1, context([1, 2])), false);
     assert.equal(needsReassignment(registry, 'young', 2, context([1, 2])), true);
@@ -343,7 +345,7 @@ describe('color registry: bookkeeping', () => {
   });
 
   it('records visibility and foreign colors', () => {
-    const registry = registryOf({ k: entry({ color: '#2563eb' }) });
+    const registry = registryOf({ k: entry({ color: '#216de8' }) });
     const hidden = planVisibility(registry, 'k', { visible: false });
     assert.equal(hidden.changed, true);
     assert.equal(hidden.registry.entries['k']?.visible, false);
@@ -357,7 +359,7 @@ describe('color registry: bookkeeping', () => {
 
   it('touches and releases process ids', () => {
     const registry = registryOf({
-      k: entry({ color: '#2563eb', pids: [2], lastSeen: NOW - LAST_SEEN_REFRESH_MS - 1 }),
+      k: entry({ color: '#216de8', pids: [2], lastSeen: NOW - LAST_SEEN_REFRESH_MS - 1 }),
     });
     const touched = planTouch(registry, 'k', 1, NOW, () => true);
     assert.deepEqual(touched.registry.entries['k']?.pids, [2, 1]);
@@ -403,8 +405,8 @@ describe('color registry: bookkeeping', () => {
       ok: { name: 'Ok', color: '#aabbcc', visible: false, claimedAt: 1, lastSeen: 2, pids: [1] },
     });
     const migrated = migrateLegacyRegistry({
-      a: { color: '#d41f6f', auto: '#d41f6f', lastSeen: 7 },
-      b: { color: '#123456', auto: '#d41f6f', lastSeen: 8 },
+      a: { color: '#c63a86', auto: '#c63a86', lastSeen: 7 },
+      b: { color: '#123456', auto: '#c63a86', lastSeen: 8 },
       c: { color: 3 },
     });
     assert.deepEqual(Object.keys(migrated), ['a', 'b']);

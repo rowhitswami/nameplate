@@ -1,15 +1,19 @@
 /**
  * The curated color palette.
  *
- * Every color was checked against WCAG AA (>= 4.5:1) with the text color that
- * `pickForeground` selects for it; the unit tests enforce this. Colors are
- * medium-deep and saturated so they read as "a color" on both light and dark
- * themes without glowing.
+ * Designed in OKLCH: the automatic colors are spread over hue and lightness so
+ * that every pair is clearly different (OKLab distance of at least 0.14, above
+ * PREFERRED_DISTANCE), which means up to eleven open windows can all look
+ * different. Each color keeps a little distance from the edge of the sRGB
+ * gamut, which keeps them vivid without looking harsh. Every color passes WCAG
+ * AA (4.5:1) with the text color `pickForeground` selects; the unit tests
+ * enforce both properties.
  *
  * IMPORTANT: the order and hex values of the entries with `auto: true` are part
  * of the automatic color assignment. Changing, removing or reordering them
  * would reshuffle the colors of existing projects. Add new automatic colors at
- * the end only; manual-only colors can change freely.
+ * the end only; manual-only colors can change freely. (The palette was last
+ * redesigned in 0.3.0, before the first Marketplace release.)
  */
 import { normalizeHexColor } from './hex';
 
@@ -25,24 +29,22 @@ export interface PaletteColor {
 }
 
 export const BUILTIN_PALETTE: readonly PaletteColor[] = [
-  { id: 'blue', name: 'Blue', hex: '#2563eb', auto: true },
-  { id: 'sky', name: 'Sky', hex: '#0369a1', auto: false },
-  { id: 'cyan', name: 'Cyan', hex: '#06b6d4', auto: true },
-  { id: 'teal', name: 'Teal', hex: '#0f766e', auto: true },
-  { id: 'green', name: 'Green', hex: '#15803d', auto: true },
-  // Lime replaced olive in 0.1.1: olive was nearly indistinguishable from green (OKLab ΔE 0.045).
-  { id: 'lime', name: 'Lime', hex: '#65a30d', auto: true },
-  // Yellow and red are kept out of automatic assignment because a yellow or
-  // red status bar reads as a warning or error state in most themes.
-  { id: 'yellow', name: 'Yellow', hex: '#ca8a04', auto: false },
-  { id: 'orange', name: 'Orange', hex: '#c2410c', auto: true },
-  { id: 'brown', name: 'Brown', hex: '#8a4513', auto: true },
-  { id: 'red', name: 'Red', hex: '#c81e1e', auto: false },
-  { id: 'pink', name: 'Pink', hex: '#d41f6f', auto: true },
-  { id: 'magenta', name: 'Magenta', hex: '#a21caf', auto: true },
-  { id: 'purple', name: 'Purple', hex: '#7e22ce', auto: true },
-  { id: 'indigo', name: 'Indigo', hex: '#4338ca', auto: true },
-  { id: 'slate', name: 'Slate', hex: '#475569', auto: false },
+  { id: 'blue', name: 'Blue', hex: '#216de8', auto: true },
+  { id: 'indigo', name: 'Indigo', hex: '#4132b9', auto: true },
+  { id: 'purple', name: 'Purple', hex: '#9051eb', auto: true },
+  { id: 'magenta', name: 'Magenta', hex: '#9212a4', auto: true },
+  { id: 'pink', name: 'Pink', hex: '#c63a86', auto: true },
+  { id: 'orange', name: 'Orange', hex: '#c74b15', auto: true },
+  { id: 'lime', name: 'Lime', hex: '#c3ea43', auto: true },
+  { id: 'green', name: 'Green', hex: '#0c6427', auto: true },
+  { id: 'teal', name: 'Teal', hex: '#158280', auto: true },
+  { id: 'cyan', name: 'Cyan', hex: '#50dee9', auto: true },
+  { id: 'ocean', name: 'Ocean', hex: '#0a557d', auto: true },
+  // Red and yellow are kept out of automatic assignment because a red or
+  // yellow status bar reads as an error or warning state in most themes.
+  { id: 'red', name: 'Red', hex: '#d02c2a', auto: false },
+  { id: 'yellow', name: 'Yellow', hex: '#f5af24', auto: false },
+  { id: 'slate', name: 'Slate', hex: '#4b596c', auto: false },
 ];
 
 /** Hex values used for automatic assignment, in their frozen order. */
@@ -55,7 +57,7 @@ export function findPaletteColor(hex: string | undefined): PaletteColor | undefi
   return normalized ? BUILTIN_PALETTE.find((c) => c.hex === normalized) : undefined;
 }
 
-/** "Blue (#2563eb)" for palette colors, "#123456" otherwise. */
+/** "Blue (#216de8)" for palette colors, "#123456" otherwise. */
 export function describeColor(hex: string): string {
   const normalized = normalizeHexColor(hex) ?? hex;
   const named = findPaletteColor(normalized);

@@ -5,6 +5,7 @@ src/**
 test/**
 out/**
 docs/**
+site/**
 scripts/**
 node_modules/**
 media/icon.svg

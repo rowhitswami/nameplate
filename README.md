@@ -3,7 +3,7 @@
 [![CI](https://github.com/rowhitswami/nameplate/actions/workflows/ci.yml/badge.svg)](https://github.com/rowhitswami/nameplate/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-Nameplate shows the project's name at the left end of the VS Code status bar and gives every project a status bar color of its own.
+Nameplate is a free VS Code extension that shows the project's name at the left end of the status bar and gives every project a status bar color of its own, so you can tell your VS Code windows apart at a glance. It also works in Cursor, Windsurf, Antigravity, Kiro, Positron and VSCodium.
 
 ![Four VS Code windows, each with its project name and its own status bar color](media/readme/hero.gif)
 
@@ -62,13 +62,13 @@ If another source spells the same name with mixed case, that spelling is used, s
 
 ## Colors
 
-The automatic palette has eleven colors: blue, cyan, teal, green, lime, orange, brown, pink, magenta, purple and indigo. Red and yellow are available when you pick a color yourself, but are never assigned automatically, because a red or yellow status bar looks like an error or a warning.
+The automatic palette has eleven modern colors: blue, indigo, purple, magenta, pink, orange, lime, green, teal, cyan and ocean. They were designed in the OKLCH color space so that every one of them looks clearly different from all the others, with readable text on each. Red, yellow and slate are available when you pick a color yourself; red and yellow are never assigned automatically, because a red or yellow status bar looks like an error or a warning.
 
-Each project gets a fixed order of these colors, worked out from its Git remote (or its folder, if there is no remote). It takes the first color in that order unless that color looks too much like the color of another open window. Colors are compared the way people see them (distance in the OKLab color space): teal next to green counts as too close, and blue next to indigo is avoided when another color is free. Once a project has a color it keeps it.
+Each project gets a fixed order of these colors, worked out from its Git remote (or its folder, if there is no remote). It takes the first color in that order unless that color looks too much like the color of another open window. Colors are compared the way people see them (distance in the OKLab color space), so two shades that look nearly the same count as the same color even when their hex codes differ. Once a project has a color it keeps it.
 
 Windows that start at the same moment, for example right after installing, take turns through a small shared file in Nameplate's storage folder, so each one sees the colors the others picked. If two open windows ever end up looking alike, the one that got the color later switches to a free color and says so in its status bar. Colors you picked yourself never change.
 
-With eleven colors, about nine windows can be told apart clearly. With more windows open, Nameplate picks the color that differs most from the ones already on screen.
+Since all eleven automatic colors are clearly different from each other, up to eleven open windows can be told apart. With more windows open, Nameplate picks the color that differs most from the ones already on screen.
 
 ## Keeping colors out of Git
 
@@ -149,7 +149,7 @@ npm run check              # typecheck, lint, formatting, unit tests
 npm run test:integration   # runs the extension in a downloaded copy of VS Code
 npm run test:multiwindow   # opens six windows of a separate VS Code and checks their colors
 npm run package            # builds nameplate-<version>.vsix
-npm run media              # rebuilds docs/index.html and the GIFs above (needs Chrome)
+npm run media              # rebuilds the product page in docs/ and the GIFs above from site/source.html (needs Chrome)
 ```
 
 Press <kbd>F5</kbd> in VS Code to start an Extension Development Host. The code is split into a part without VS Code dependencies (`src/core`, covered by unit tests) and the code that talks to VS Code. [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) explains how the parts fit together.
@@ -157,8 +157,28 @@ Press <kbd>F5</kbd> in VS Code to start an Extension Development Host. The code 
 To install a local build:
 
 ```bash
-code --install-extension nameplate-0.2.0.vsix
+code --install-extension nameplate-0.3.0.vsix
 ```
+
+## Questions
+
+**How can I tell VS Code windows apart?**
+Give every project its own status bar color and show its name. Nameplate does both automatically. It reads the project name from the folder, `package.json` or the Git remote, and gives each project a color that looks different from the other open windows.
+
+**How do I change the status bar color for one project?**
+VS Code reads `workbench.colorCustomizations` from the project's `.vscode/settings.json` and applies it to that window only. Nameplate writes the status bar colors there for you, picks a readable text color, and lets you choose another color by clicking the project name.
+
+**Will it change files in my Git repository?**
+The colors have to be in `.vscode/settings.json`, but Git never sees them. A settings file Nameplate creates is listed in `.git/info/exclude`, and in a settings file you commit, a local Git filter hides Nameplate's lines. Nothing shows up in `git status` or in a commit.
+
+**Does it work in Cursor, Windsurf, Antigravity or Kiro?**
+Yes. Nameplate uses the standard extension API. Cursor, Windsurf, Antigravity, Kiro, Positron and VSCodium install it from Open VSX, and VS Code installs it from the Visual Studio Marketplace.
+
+**How is it different from Peacock?**
+Peacock colors the title bar, activity bar and status bar with colors you choose and stores them in the workspace settings. Nameplate picks colors automatically, adds the project name, keeps open windows from sharing a color, and keeps the settings out of Git. You can use both; Nameplate leaves colors set by Peacock alone.
+
+**Does it collect any data?**
+No. Nameplate makes no network requests and has no telemetry. Everything it stores stays in VS Code's storage on your computer.
 
 ## Contributing
 

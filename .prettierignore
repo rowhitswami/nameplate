@@ -6,4 +6,4 @@ node_modules/
 CHANGELOG.md
 package-lock.json
 docs/index.html
-docs/site-source.html
+site/source.html

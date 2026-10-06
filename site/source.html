@@ -71,7 +71,7 @@ p { margin: 0; }
 }
 .brand { display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-weight: 800; font-size: 26px; letter-spacing: 0.04em; text-transform: uppercase; }
 .brand svg { width: 28px; height: 28px; flex: none; }
-.head-end { display: flex; align-items: center; gap: 10px; margin-left: auto; min-width: 0; }
+.head-end { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 10px; margin-left: auto; min-width: 0; }
 /* GitHub link: version, stars and forks are written in at build time and refreshed by the script. */
 .gh { display: inline-flex; align-items: center; gap: 10px; padding: 6px 12px 6px 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--ink); text-decoration: none; transition: border-color 0.15s; }
 .gh:hover, .gh:focus-visible { border-color: color-mix(in srgb, var(--ink) 45%, var(--line)); }

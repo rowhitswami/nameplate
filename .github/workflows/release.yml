@@ -1,0 +1,50 @@
+# Builds the .vsix for a version tag and attaches it to a GitHub release.
+# Marketplace / Open VSX publishing only runs when the corresponding secret is
+# configured in the repository (Settings → Secrets → Actions):
+#   VSCE_PAT — Azure DevOps personal access token with "Marketplace (Manage)" scope
+#   OVSX_PAT — Open VSX access token
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - name: Verify tag matches package.json version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          if [ "v$VERSION" != "${GITHUB_REF_NAME}" ]; then
+            echo "Tag ${GITHUB_REF_NAME} does not match package.json version $VERSION" >&2
+            exit 1
+          fi
+      - name: Package
+        run: npx vsce package --out nameplate-${GITHUB_REF_NAME#v}.vsix
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: nameplate-*.vsix
+          generate_release_notes: true
+      - name: Publish to Visual Studio Marketplace
+        if: ${{ secrets.VSCE_PAT != '' }}
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: npx vsce publish --packagePath nameplate-*.vsix
+      - name: Publish to Open VSX
+        if: ${{ secrets.OVSX_PAT != '' }}
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+        run: npx ovsx publish nameplate-*.vsix --pat "$OVSX_PAT"

@@ -1,0 +1,9 @@
+dist/
+out/
+node_modules/
+.vscode-test/
+*.vsix
+CHANGELOG.md
+package-lock.json
+docs/index.html
+docs/site-source.html

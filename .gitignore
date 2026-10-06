@@ -1,0 +1,19 @@
+# Build output
+dist/
+out/
+*.vsix
+
+# Dependencies
+node_modules/
+
+# VS Code test runner downloads and user data
+.vscode-test/
+
+# Per-developer editor state. Nameplate itself writes its colors here, so this
+# repository deliberately does not track a workspace settings file.
+.vscode/settings.json
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.log

@@ -1,0 +1,415 @@
+{
+  "name": "nameplate",
+  "displayName": "Nameplate",
+  "description": "Gives every VS Code window a project name and its own status bar color, so you always know which project you are working in.",
+  "version": "0.2.0",
+  "publisher": "rowhitswami",
+  "license": "MIT",
+  "author": {
+    "name": "Rohit Swami"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rowhitswami/nameplate.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rowhitswami/nameplate/issues"
+  },
+  "homepage": "https://github.com/rowhitswami/nameplate#readme",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "project",
+    "workspace",
+    "window",
+    "status bar",
+    "color",
+    "identity",
+    "multi-window",
+    "peacock"
+  ],
+  "icon": "media/icon.png",
+  "galleryBanner": {
+    "color": "#0f172a",
+    "theme": "dark"
+  },
+  "pricing": "Free",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./dist/extension.js",
+  "extensionKind": [
+    "ui",
+    "workspace"
+  ],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": true
+    },
+    "virtualWorkspaces": {
+      "supported": "limited",
+      "description": "The project name is shown. Coloring the status bar writes workspace settings, which Nameplate only does after confirmation in virtual workspaces."
+    }
+  },
+  "contributes": {
+    "commands": [
+      {
+        "command": "nameplate.showMenu",
+        "title": "Show Project Actions",
+        "category": "Nameplate",
+        "icon": "$(folder)"
+      },
+      {
+        "command": "nameplate.renameProject",
+        "title": "Rename Project...",
+        "category": "Nameplate"
+      },
+      {
+        "command": "nameplate.changeColor",
+        "title": "Change Project Color...",
+        "category": "Nameplate"
+      },
+      {
+        "command": "nameplate.setLabel",
+        "title": "Set Environment Label...",
+        "category": "Nameplate"
+      },
+      {
+        "command": "nameplate.resetName",
+        "title": "Reset Project Name",
+        "category": "Nameplate"
+      },
+      {
+        "command": "nameplate.resetColor",
+        "title": "Reset Project Color",
+        "category": "Nameplate"
+      },
+      {
+        "command": "nameplate.regenerateColor",
+        "title": "Regenerate Automatic Color",
+        "category": "Nameplate"
+      },
+      {
+        "command": "nameplate.resetIdentity",
+        "title": "Reset Project Identity",
+        "category": "Nameplate"
+      },
+      {
+        "command": "nameplate.showInfo",
+        "title": "Show Project Information",
+        "category": "Nameplate"
+      },
+      {
+        "command": "nameplate.copyPath",
+        "title": "Copy Project Path",
+        "category": "Nameplate"
+      },
+      {
+        "command": "nameplate.copyRemote",
+        "title": "Copy Git Remote",
+        "category": "Nameplate"
+      },
+      {
+        "command": "nameplate.openFolder",
+        "title": "Open Project Folder",
+        "category": "Nameplate"
+      },
+      {
+        "command": "nameplate.openRepository",
+        "title": "Open Repository",
+        "category": "Nameplate"
+      },
+      {
+        "command": "nameplate.toggleColoring",
+        "title": "Toggle Project Coloring",
+        "category": "Nameplate"
+      },
+      {
+        "command": "nameplate.enable",
+        "title": "Enable",
+        "category": "Nameplate"
+      },
+      {
+        "command": "nameplate.disable",
+        "title": "Disable",
+        "category": "Nameplate"
+      },
+      {
+        "command": "nameplate.showLog",
+        "title": "Show Log",
+        "category": "Nameplate"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "nameplate.showMenu",
+          "when": "workspaceFolderCount > 0"
+        },
+        {
+          "command": "nameplate.renameProject",
+          "when": "workspaceFolderCount > 0"
+        },
+        {
+          "command": "nameplate.changeColor",
+          "when": "workspaceFolderCount > 0"
+        },
+        {
+          "command": "nameplate.setLabel",
+          "when": "workspaceFolderCount > 0"
+        },
+        {
+          "command": "nameplate.resetName",
+          "when": "workspaceFolderCount > 0"
+        },
+        {
+          "command": "nameplate.resetColor",
+          "when": "workspaceFolderCount > 0"
+        },
+        {
+          "command": "nameplate.regenerateColor",
+          "when": "workspaceFolderCount > 0"
+        },
+        {
+          "command": "nameplate.resetIdentity",
+          "when": "workspaceFolderCount > 0"
+        },
+        {
+          "command": "nameplate.showInfo",
+          "when": "workspaceFolderCount > 0"
+        },
+        {
+          "command": "nameplate.copyPath",
+          "when": "workspaceFolderCount > 0"
+        },
+        {
+          "command": "nameplate.copyRemote",
+          "when": "workspaceFolderCount > 0"
+        },
+        {
+          "command": "nameplate.openFolder",
+          "when": "workspaceFolderCount > 0"
+        },
+        {
+          "command": "nameplate.openRepository",
+          "when": "workspaceFolderCount > 0"
+        },
+        {
+          "command": "nameplate.toggleColoring",
+          "when": "workspaceFolderCount > 0"
+        },
+        {
+          "command": "nameplate.enable",
+          "when": "!config.nameplate.enabled"
+        },
+        {
+          "command": "nameplate.disable",
+          "when": "config.nameplate.enabled"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Nameplate",
+      "properties": {
+        "nameplate.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Turn Nameplate on or off. When off, the project name is hidden and any status bar colors managed by Nameplate are removed from the current workspace.",
+          "order": 1
+        },
+        "nameplate.showProjectName": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the project name in the status bar.",
+          "order": 2
+        },
+        "nameplate.colorStatusBar": {
+          "type": "boolean",
+          "default": true,
+          "description": "Give the whole status bar a project-specific color.",
+          "order": 3
+        },
+        "nameplate.icon": {
+          "type": "string",
+          "default": "folder",
+          "pattern": "^[a-z0-9-]*$",
+          "patternErrorMessage": "Use a codicon name such as 'folder', 'rocket' or 'home'. Leave empty for no icon.",
+          "markdownDescription": "Codicon shown before the project name, for example `folder`, `rocket`, `home` or `symbol-color`. Leave empty to hide the icon. See the [codicon reference](https://microsoft.github.io/vscode-codicons/dist/codicon.html).",
+          "order": 4
+        },
+        "nameplate.showBranch": {
+          "type": "boolean",
+          "default": false,
+          "description": "Append the current Git branch to the project name, for example 'BrightDesk • main'. Off by default because the built-in Git status bar item already shows the branch.",
+          "order": 5
+        },
+        "nameplate.textTransform": {
+          "type": "string",
+          "enum": [
+            "auto",
+            "none",
+            "uppercase",
+            "lowercase",
+            "capitalize"
+          ],
+          "enumDescriptions": [
+            "Keep names that carry their own casing (BrightDesk, TrailMix) and show plain lowercase names in uppercase (brightdesk-mobile → BRIGHTDESK MOBILE).",
+            "Show the detected name exactly as found.",
+            "Always uppercase.",
+            "Always lowercase.",
+            "Capitalize Each Word."
+          ],
+          "default": "auto",
+          "description": "How the project name is styled in the status bar. Separators such as '-' and '_' become spaces unless set to 'none'.",
+          "order": 6
+        },
+        "nameplate.nameSource": {
+          "type": "string",
+          "enum": [
+            "auto",
+            "folder",
+            "manifest",
+            "repository"
+          ],
+          "enumDescriptions": [
+            "Workspace or folder name when meaningful, then project manifests (package.json, pyproject.toml, Cargo.toml, go.mod, ...), then the Git repository name.",
+            "Prefer the workspace folder name.",
+            "Prefer the project manifest (package.json name or displayName, Expo app name, pyproject.toml, Cargo.toml, go.mod, ...).",
+            "Prefer the Git repository name taken from the remote URL."
+          ],
+          "default": "auto",
+          "description": "Which source the automatic project name is taken from first. Other sources are still used as fallbacks. A custom name set with 'Rename Project' always wins.",
+          "order": 7
+        },
+        "nameplate.colorSource": {
+          "type": "string",
+          "enum": [
+            "auto",
+            "path",
+            "name"
+          ],
+          "enumDescriptions": [
+            "Git remote URL (same repository → same color on every machine), falling back to the workspace location.",
+            "Workspace location. Different clones of the same repository get different colors.",
+            "Project display name."
+          ],
+          "default": "auto",
+          "description": "What the automatic color is derived from.",
+          "order": 8
+        },
+        "nameplate.avoidColorCollisions": {
+          "type": "boolean",
+          "default": true,
+          "description": "Give windows that are open at the same time clearly different colors (compared by how they look, not by hex value) and prefer colors your other recent projects don't use. If two open windows ever look alike, the one that got the color later moves to a free one. Turn off for a purely hash-based color that is identical on every machine.",
+          "order": 9
+        },
+        "nameplate.palette": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^#?([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$",
+            "patternErrorMessage": "Use hex colors such as #2563eb."
+          },
+          "default": [],
+          "markdownDescription": "Colors used for automatic assignment, as hex values. Leave empty to use Nameplate's built-in accessible palette. Text color is always computed for readability. Use colors that look clearly different from each other: Nameplate treats near-identical colors as the same when keeping open windows apart.",
+          "order": 10
+        },
+        "nameplate.colorWhileDebugging": {
+          "type": "boolean",
+          "default": false,
+          "description": "Keep the project color while a debug session is running, instead of the theme's debugging color.",
+          "order": 11
+        },
+        "nameplate.keepColorsOutOfGit": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Keep Nameplate's color settings out of Git, without changing anything that is committed: a `.vscode/settings.json` that Nameplate creates is listed in `.git/info/exclude`, and in a settings file that Git already tracks, a local Git filter (`.git/config`, `.git/info/attributes`) hides Nameplate's lines, so they never show up in `git status` or a commit. Your own edits to the file still do. Everything is removed again when Nameplate stops coloring the project. Where this is not possible (a tracked settings file in a remote window), the project shows its name without the color.",
+          "order": 12
+        },
+        "nameplate.gitTrackedSettings": {
+          "type": "string",
+          "enum": [
+            "ask",
+            "always",
+            "never"
+          ],
+          "enumDescriptions": [
+            "Ask once per project before adding color settings to a tracked file.",
+            "Add the color settings without asking.",
+            "Never color a project whose settings file is tracked by Git (the project name is still shown)."
+          ],
+          "default": "ask",
+          "markdownDescription": "What to do when the file that stores the status bar color (`.vscode/settings.json` or the `.code-workspace` file) is tracked by Git, so that the color would show up as a change in the repository.",
+          "order": 90,
+          "deprecationMessage": "Replaced by nameplate.keepColorsOutOfGit in 0.2.0: Nameplate no longer needs to ask, because its lines are filtered out of Git.",
+          "markdownDeprecationMessage": "Replaced by `#nameplate.keepColorsOutOfGit#` in 0.2.0: Nameplate no longer needs to ask, because its lines are filtered out of Git."
+        },
+        "nameplate.hideSettingsFromGit": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "When Nameplate has to create `.vscode/settings.json` inside a Git repository, list it in the repository's local exclude file (`.git/info/exclude`) so that it never shows up in `git status`. This never touches `.gitignore` or tracked files, and the entry is removed again when Nameplate stops coloring the project.",
+          "order": 91,
+          "deprecationMessage": "Replaced by nameplate.keepColorsOutOfGit in 0.2.0.",
+          "markdownDeprecationMessage": "Replaced by `#nameplate.keepColorsOutOfGit#` in 0.2.0."
+        },
+        "nameplate.statusBarPriority": {
+          "type": "number",
+          "default": 1000000,
+          "description": "Priority of the project name item. Higher values move it further to the left of the status bar.",
+          "order": 14
+        },
+        "nameplate.showFirstRunNotification": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show a one-time notification when a project receives its color for the first time.",
+          "order": 15
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run build",
+    "build": "node esbuild.mjs --production",
+    "bundle": "node esbuild.mjs",
+    "watch": "node esbuild.mjs --watch",
+    "typecheck": "tsc --noEmit -p ./",
+    "compile-tests": "tsc -p ./",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test:unit": "npm run compile-tests && npm run bundle && mocha \"out/test/unit/**/*.test.js\"",
+    "test:integration": "npm run compile-tests && npm run bundle && vscode-test",
+    "test": "npm run test:unit && npm run test:integration",
+    "check": "npm run typecheck && npm run lint && npm run format:check && npm run test:unit",
+    "package": "vsce package",
+    "test:multiwindow": "vsce package && node scripts/e2e-multiwindow.mjs",
+    "icon": "node scripts/render-icon.mjs",
+    "clean": "node scripts/clean.mjs",
+    "media": "node scripts/render-media.mjs"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^22.0.0",
+    "@types/vscode": "1.85.0",
+    "@vscode/test-cli": "^0.0.15",
+    "@vscode/test-electron": "^3.1.0",
+    "@vscode/vsce": "^4.0.0",
+    "esbuild": "^0.28.2",
+    "eslint": "^10.12.0",
+    "gifenc": "^1.0.3",
+    "mocha": "^11.7.6",
+    "pngjs": "^7.0.0",
+    "prettier": "^3.9.9",
+    "puppeteer-core": "^25.12.0",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.71.1"
+  },
+  "dependencies": {
+    "jsonc-parser": "^3.3.1"
+  }
+}

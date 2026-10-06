@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <!-- Nameplate: a window whose status bar carries the project's color and name. -->
+  <rect width="128" height="128" rx="28" fill="#0f172a"/>
+  <rect x="18" y="22" width="92" height="84" rx="12" fill="#1e293b"/>
+  <circle cx="30" cy="34" r="3.5" fill="#475569"/>
+  <circle cx="41" cy="34" r="3.5" fill="#475569"/>
+  <circle cx="52" cy="34" r="3.5" fill="#475569"/>
+  <rect x="28" y="48" width="44" height="5" rx="2.5" fill="#334155"/>
+  <rect x="28" y="59" width="62" height="5" rx="2.5" fill="#334155"/>
+  <rect x="28" y="70" width="36" height="5" rx="2.5" fill="#334155"/>
+  <path d="M18 84h92v10a12 12 0 0 1-12 12H30a12 12 0 0 1-12-12z" fill="#2563eb"/>
+  <rect x="26" y="90" width="34" height="9" rx="4.5" fill="#ffffff"/>
+  <circle cx="98" cy="94.5" r="4" fill="#ffffff" opacity="0.85"/>
+</svg>

@@ -1,0 +1,776 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Nameplate gives every VS Code window its project name and its own status bar color.">
+<title>Nameplate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sofia+Sans+Extra+Condensed:wght@600;800;900&family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a desk of VS Code windows. The page opens on the problem (identical windows), then each section pairs
+   one thing Nameplate does with an animated mock of it. Status bars are drawn like label-maker tape. */
+:root {
+  --ground: #f2f3f6;
+  --panel: #ffffff;
+  --ink: #14161b;
+  --muted: #5a6170;
+  --line: #d8dce4;
+  --accent: #2259e0;
+  --accent-ink: #ffffff;
+  --desk: #e4e7ed;
+  --desk-dot: #cfd4dd;
+  --ok: #0f7a4a;
+  --todo: #b25e09;
+  /* VS Code chrome stays dark in both themes, like most of its users' screens. */
+  --win: #1d1e23;
+  --win-2: #24262c;
+  --win-line: #33363e;
+  --win-text: #c8ccd4;
+  --win-dim: #80858f;
+  --win-key: #c792ea;
+  --win-str: #addb67;
+  --win-num: #f78c6c;
+  --win-fn: #82aaff;
+  --neutral-bar: #383b43;
+  --font-display: "Sofia Sans Extra Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --font-body: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #0d0f13; --panel: #15181e; --ink: #eceef3; --muted: #9ba3b2; --line: #2a2e38;
+    --accent: #7aa2ff; --accent-ink: #0d0f13; --desk: #11141a; --desk-dot: #232833;
+    --ok: #4cc38a; --todo: #f0a64a; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #0d0f13; --panel: #15181e; --ink: #eceef3; --muted: #9ba3b2; --line: #2a2e38;
+  --accent: #7aa2ff; --accent-ink: #0d0f13; --desk: #11141a; --desk-dot: #232833;
+  --ok: #4cc38a; --todo: #f0a64a; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--ground); color: var(--ink);
+  font-family: var(--font-body); font-size: 17px; line-height: 1.55;
+  padding-inline: clamp(16px, 4vw, 48px); padding-block: 0 64px;
+}
+a { color: var(--accent); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+code, pre, kbd { font-family: var(--font-mono); font-size: 0.86em; }
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+p { margin: 0; }
+.wrap { max-width: 1120px; margin-inline: auto; }
+
+/* ---------- tabs ---------- */
+.tabs {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 50;
+  display: flex; gap: 6px; align-items: center; justify-content: space-between; flex-wrap: wrap;
+  padding-block: 12px; margin-bottom: 8px;
+  background: color-mix(in srgb, var(--ground) 88%, transparent);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.brand { display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-weight: 800; font-size: 26px; letter-spacing: 0.04em; text-transform: uppercase; }
+.brand svg { width: 28px; height: 28px; flex: none; }
+.tablist { display: flex; gap: 4px; background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 4px; }
+.tablist button {
+  font: 500 15px/1 var(--font-body); color: var(--muted); background: none; border: 0; border-radius: 999px;
+  padding: 9px 16px; cursor: pointer;
+}
+.tablist button[aria-selected="true"] { background: var(--ink); color: var(--ground); }
+.tablist:has(> button:only-of-type) { display: none; }
+
+/* ---------- label tape ---------- */
+.tape {
+  --c: #2563eb; --t: #fff;
+  display: inline-flex; align-items: center; gap: 0.45em;
+  background: linear-gradient(180deg, color-mix(in srgb, #fff 16%, var(--c)) 0%, var(--c) 46%, color-mix(in srgb, #000 12%, var(--c)) 100%);
+  color: var(--t);
+  font-family: var(--font-display); font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em;
+  padding: 0.18em 0.7em 0.14em; border-radius: 3px;
+  text-shadow: 0 1px 0 color-mix(in srgb, #000 28%, transparent), 0 -1px 0 color-mix(in srgb, #fff 22%, transparent);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.25), inset 0 0 0 1px rgb(0 0 0 / 0.08);
+  white-space: nowrap;
+}
+
+/* ---------- hero ---------- */
+.hero { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: clamp(24px, 4vw, 56px); align-items: center; padding-block: 40px 56px; }
+.hero h1 { font-family: var(--font-display); font-weight: 900; font-size: clamp(54px, 8.4vw, 104px); line-height: 0.88; text-transform: uppercase; letter-spacing: 0.005em; margin-block: 0 20px; }
+.lede { font-size: 19px; color: var(--muted); max-width: 34em; }
+.lede strong { color: var(--ink); font-weight: 700; }
+.cta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; align-items: center; }
+.btn { display: inline-flex; align-items: center; gap: 8px; font: 700 15px/1 var(--font-body); padding: 13px 18px; border-radius: 8px; text-decoration: none; border: 1px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+.cmd { display: inline-flex; align-items: center; gap: 10px; font-family: var(--font-mono); font-size: 13.5px; background: var(--panel); border: 1px dashed var(--line); border-radius: 8px; padding: 10px 12px; min-width: 0; max-width: 100%; }
+.cmd span { overflow-x: auto; white-space: nowrap; }
+.copy { font: 600 12px/1 var(--font-body); color: var(--accent); background: none; border: 0; cursor: pointer; padding: 4px 6px; border-radius: 4px; flex: none; }
+
+/* ---------- stages (shared) ---------- */
+.stage {
+  position: relative; container-type: inline-size; width: 100%; max-width: 100%;
+  background-color: var(--desk);
+  background-image: radial-gradient(var(--desk-dot) 1px, transparent 1.2px);
+  background-size: 18px 18px;
+  border-radius: 14px; border: 1px solid var(--line); overflow: hidden;
+}
+.stage.dark { --desk: #12151b; --desk-dot: #1f242e; border-color: #262b35; }
+.win {
+  position: absolute; display: flex; flex-direction: column;
+  background: var(--win); border-radius: 1.1cqw; overflow: hidden;
+  box-shadow: 0 1.2cqw 3cqw rgb(0 0 0 / 0.28), 0 0 0 1px rgb(0 0 0 / 0.35);
+  color: var(--win-text); font-family: var(--font-mono); font-size: 1.45cqw; line-height: 1.55;
+}
+.titlebar { display: flex; align-items: center; gap: 1cqw; height: 3.4cqw; padding-inline: 1.2cqw; background: var(--win-2); border-bottom: 1px solid var(--win-line); font-family: var(--font-body); font-size: 1.3cqw; color: var(--win-dim); }
+.dots { display: flex; gap: 0.55cqw; }
+.dots i { width: 1cqw; height: 1cqw; border-radius: 50%; background: #4a4d55; display: block; }
+.titlebar .t { flex: 1; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 4cqw; }
+.body { flex: 1; display: grid; grid-template-columns: 3.2cqw 15cqw 1fr; min-height: 0; }
+.activity { background: var(--win-2); border-right: 1px solid var(--win-line); }
+.tree { border-right: 1px solid var(--win-line); padding: 0.9cqw 0.9cqw; display: flex; flex-direction: column; gap: 0.5cqw; overflow: hidden; }
+.tree b { display: block; height: 0.75cqw; border-radius: 0.4cqw; background: #3a3d46; }
+.code { padding: 0.9cqw 1.4cqw; overflow: hidden; white-space: pre; }
+.code .k { color: var(--win-key); } .code .s { color: var(--win-str); } .code .n { color: var(--win-num); } .code .f { color: var(--win-fn); } .code .c { color: #637081; }
+.sb {
+  --c: #2563eb; --t: #fff;
+  display: flex; align-items: center; gap: 1.6cqw; height: 3cqw; padding-inline: 0.9cqw;
+  background: var(--c); color: var(--t); font-family: var(--font-body); font-size: 1.25cqw; white-space: nowrap;
+}
+.sb .name { display: inline-flex; align-items: center; gap: 0.5cqw; font-weight: 700; letter-spacing: 0.02em; }
+.sb .name svg { width: 1.35cqw; height: 1.35cqw; }
+.sb .muted { opacity: 0.85; }
+.sb .right { margin-left: auto; opacity: 0.85; }
+
+/* ---------- hero desk: windows take turns in front; unfocused ones keep their color ---------- */
+.desk { aspect-ratio: 16 / 11; }
+.desk .win { width: 57%; height: 44%; animation: front 12s infinite; }
+.desk .win .titlebar, .desk .win .body { animation: dim 12s infinite; }
+.desk .win:nth-child(1) { left: 3%; top: 4%; }
+.desk .win:nth-child(2) { left: 40%; top: 9%; animation-delay: -9s; }
+.desk .win:nth-child(3) { left: 6%; top: 51%; animation-delay: -6s; }
+.desk .win:nth-child(4) { left: 39%; top: 54%; animation-delay: -3s; }
+.desk .win:nth-child(2) .titlebar, .desk .win:nth-child(2) .body { animation-delay: -9s; }
+.desk .win:nth-child(3) .titlebar, .desk .win:nth-child(3) .body { animation-delay: -6s; }
+.desk .win:nth-child(4) .titlebar, .desk .win:nth-child(4) .body { animation-delay: -3s; }
+@keyframes front {
+  0%, 23% { z-index: 6; transform: translateY(-1.2cqw); box-shadow: 0 2.6cqw 5cqw rgb(0 0 0 / 0.4), 0 0 0 1px rgb(0 0 0 / 0.4); }
+  25.5%, 97.5% { z-index: 1; transform: none; box-shadow: 0 1.2cqw 3cqw rgb(0 0 0 / 0.28), 0 0 0 1px rgb(0 0 0 / 0.35); }
+  100% { z-index: 6; transform: translateY(-1.2cqw); box-shadow: 0 2.6cqw 5cqw rgb(0 0 0 / 0.4), 0 0 0 1px rgb(0 0 0 / 0.4); }
+}
+/* The same windows lose their names and colors for a few seconds: what VS Code looks like without Nameplate. */
+.desk .sb { animation: bars 12s infinite; }
+.desk .sb .name { overflow: hidden; animation: names 12s infinite; }
+@keyframes bars {
+  0%, 55% { background: var(--c); color: var(--t); }
+  57%, 85% { background: #181818; color: #9da1a8; }
+  87%, 100% { background: var(--c); color: var(--t); }
+}
+@keyframes names {
+  0%, 55% { max-width: 30cqw; opacity: 1; }
+  57%, 85% { max-width: 0; opacity: 0; }
+  87%, 100% { max-width: 30cqw; opacity: 1; }
+}
+.state { position: absolute; right: 2.5%; top: 2.2%; z-index: 8; display: grid; justify-items: end; font-family: var(--font-body); font-size: 1.5cqw; font-weight: 700; }
+.state span { grid-area: 1 / 1; padding: 0.5cqw 1.1cqw; border-radius: 99px; white-space: nowrap; }
+.state .with { background: #f4f5f8; color: #14161b; animation: with 12s infinite; }
+.state .without { background: #2b2e36; color: #d9dce3; opacity: 0; animation: without 12s infinite; }
+@keyframes with { 0%, 55% { opacity: 1; } 57%, 85% { opacity: 0; } 87%, 100% { opacity: 1; } }
+@keyframes without { 0%, 55% { opacity: 0; } 57%, 85% { opacity: 1; } 87%, 100% { opacity: 0; } }
+@keyframes dim {
+  0%, 23% { opacity: 1; }
+  25.5%, 97.5% { opacity: 0.62; }
+  100% { opacity: 1; }
+}
+
+/* ---------- sections ---------- */
+section.feature { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: clamp(20px, 4vw, 56px); align-items: center; padding-block: 48px; border-top: 1px solid var(--line); }
+section.feature.flip { grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr); }
+section.feature.flip .copytext { order: 2; }
+.copytext { display: grid; gap: 14px; min-width: 0; }
+.copytext h2 { font-family: var(--font-display); font-weight: 800; font-size: clamp(36px, 4.6vw, 54px); line-height: 0.95; text-transform: uppercase; letter-spacing: 0.01em; }
+.copytext p { color: var(--muted); max-width: 33em; }
+.copytext p strong { color: var(--ink); }
+/* problem */
+.problem { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: clamp(20px, 4vw, 56px); padding-block: 48px; border-top: 1px solid var(--line); }
+.problem h2, .editors h2, .notes h2 { font-family: var(--font-display); font-weight: 800; font-size: clamp(36px, 4.6vw, 54px); line-height: 0.95; text-transform: uppercase; letter-spacing: 0.01em; }
+.prose { display: grid; gap: 14px; max-width: 38em; }
+.prose p { color: var(--muted); font-size: 18.5px; }
+.prose p strong { color: var(--ink); }
+
+/* editors: each editor gets a nameplate of its own */
+.editors { display: grid; gap: 28px; padding-block: 48px; border-top: 1px solid var(--line); }
+.editors .intro { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: clamp(20px, 4vw, 56px); align-items: end; }
+.editor-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px 18px; }
+.ed { display: grid; gap: 10px; min-width: 0; }
+.ed-win { container-type: inline-size; aspect-ratio: 16 / 10; background: var(--win); border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 6px 18px rgb(0 0 0 / 0.16), 0 0 0 1px rgb(0 0 0 / 0.3); }
+.ed-win .tb { height: 9cqw; flex: none; background: var(--win-2); border-bottom: 1px solid var(--win-line); display: flex; align-items: center; gap: 2cqw; padding-inline: 3.5cqw; }
+.ed-win .tb i { width: 2.8cqw; height: 2.8cqw; border-radius: 50%; background: #4a4d55; display: block; }
+.ed-win .lines { flex: 1; padding: 5cqw; display: grid; gap: 3cqw; align-content: start; }
+.ed-win .lines b { display: block; height: 2.4cqw; border-radius: 2cqw; background: #3a3d46; }
+.ed-win .lines b:nth-child(2) { background: #5b4a7a; } .ed-win .lines b:nth-child(4) { background: #43604b; }
+.ed-win .bar { --c: #2563eb; --t: #fff; height: 11cqw; flex: none; display: flex; align-items: center; gap: 2cqw; padding-inline: 3.5cqw; background: var(--c); color: var(--t); font: 700 5.4cqw/1 var(--font-body); letter-spacing: 0.04em; white-space: nowrap; }
+/* When the section scrolls into view, the editors get their nameplates one after another. Fully colored at rest. */
+.editor-grid.play .bar { animation: light 0.9s both; animation-delay: calc(var(--i) * 160ms + 150ms); }
+.ed-win .bar svg { width: 5.4cqw; height: 5.4cqw; flex: none; }
+@keyframes light { from { background: #2a2c33; color: #8a8f99; } to { background: var(--c); color: var(--t); } }
+.ed-meta { display: grid; gap: 4px; }
+.ed-meta strong { font-size: 17px; }
+.ed-meta span { color: var(--muted); font-size: 14.5px; }
+.reg { justify-self: start; font: 600 12px/1 var(--font-mono); padding: 5px 7px; border-radius: 5px; background: color-mix(in srgb, var(--ink) 7%, transparent); color: var(--ink); }
+.editors .foot { color: var(--muted); font-size: 15.5px; max-width: 52em; }
+
+/* notes */
+.notes { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: clamp(20px, 4vw, 56px); padding-block: 44px; border-top: 1px solid var(--line); }
+.notes ul { margin: 0; padding-left: 20px; display: grid; gap: 10px; color: var(--muted); font-size: 16.5px; max-width: 40em; }
+
+/* palette of tapes */
+.tapes { display: flex; flex-wrap: wrap; gap: 12px 10px; align-items: center; }
+.tapes .tape { font-size: 22px; }
+.tapes figure { margin: 0; display: grid; gap: 4px; justify-items: start; }
+.tapes figcaption { font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); padding-left: 2px; }
+.manual .tape { opacity: 0.9; }
+
+/* ---------- coordinate: five windows open at once, the lock visits each ---------- */
+.coord { aspect-ratio: 16 / 7.6; }
+.coord .win { width: 17.6%; height: 52%; top: 15%; animation: pop 9s infinite; font-size: 0.9cqw; }
+.coord .win .body { grid-template-columns: 1.6cqw 1fr; }
+.coord .win .tree { display: none; }
+.coord .titlebar { height: 2.4cqw; font-size: 0.85cqw; }
+.coord .sb { height: 3.3cqw; font-size: 1.45cqw; padding-inline: 0.8cqw; gap: 0.6cqw; letter-spacing: 0.02em; }
+.coord .lines { padding: 1cqw; display: grid; gap: 0.7cqw; align-content: start; }
+.coord .lines b { display: block; height: 0.65cqw; border-radius: 0.35cqw; background: #3a3d46; }
+.coord .lines b:nth-child(3n+1) { background: #5b4a7a; } .coord .lines b:nth-child(4n+2) { background: #43604b; }
+.coord .win:nth-child(1) { left: 2%; } .coord .win:nth-child(2) { left: 21.6%; } .coord .win:nth-child(3) { left: 41.2%; }
+.coord .win:nth-child(4) { left: 60.8%; } .coord .win:nth-child(5) { left: 80.4%; }
+.coord .sb { animation: claim 9s infinite; }
+.coord .win:nth-child(1) .sb { animation-name: claim1; } .coord .win:nth-child(2) .sb { animation-name: claim2; }
+.coord .win:nth-child(3) .sb { animation-name: claim3; } .coord .win:nth-child(4) .sb { animation-name: claim4; }
+.coord .win:nth-child(5) .sb { animation-name: claim5; }
+@keyframes pop { 0%, 8% { transform: none; opacity: 1; } 10% { transform: scale(0.94); opacity: 0.4; } 13%, 100% { transform: none; opacity: 1; } }
+@keyframes claim1 { 0%, 9% { background: var(--c); color: var(--t); } 10%, 19% { background: var(--neutral-bar); color: #d0d3da; } 21%, 100% { background: var(--c); color: var(--t); } }
+@keyframes claim2 { 0%, 9% { background: var(--c); color: var(--t); } 10%, 31% { background: var(--neutral-bar); color: #d0d3da; } 33%, 100% { background: var(--c); color: var(--t); } }
+@keyframes claim3 { 0%, 9% { background: var(--c); color: var(--t); } 10%, 43% { background: var(--neutral-bar); color: #d0d3da; } 45%, 100% { background: var(--c); color: var(--t); } }
+@keyframes claim4 { 0%, 9% { background: var(--c); color: var(--t); } 10%, 55% { background: var(--neutral-bar); color: #d0d3da; } 57%, 100% { background: var(--c); color: var(--t); } }
+@keyframes claim5 { 0%, 9% { background: var(--c); color: var(--t); } 10%, 67% { background: var(--neutral-bar); color: #d0d3da; } 69%, 100% { background: var(--c); color: var(--t); } }
+.hex { position: absolute; top: 69.5%; font-family: var(--font-mono); font-size: 1.15cqw; color: #aab1be; width: 17.6%; text-align: center; animation: hexin 9s infinite; }
+.hex:nth-of-type(1) { left: 2%; } .hex:nth-of-type(2) { left: 21.6%; animation-name: hexin2; } .hex:nth-of-type(3) { left: 41.2%; animation-name: hexin3; }
+.hex:nth-of-type(4) { left: 60.8%; animation-name: hexin4; } .hex:nth-of-type(5) { left: 80.4%; animation-name: hexin5; }
+@keyframes hexin { 0%, 9% { opacity: 1; } 10%, 19% { opacity: 0; } 21%, 100% { opacity: 1; } }
+@keyframes hexin2 { 0%, 9% { opacity: 1; } 10%, 31% { opacity: 0; } 33%, 100% { opacity: 1; } }
+@keyframes hexin3 { 0%, 9% { opacity: 1; } 10%, 43% { opacity: 0; } 45%, 100% { opacity: 1; } }
+@keyframes hexin4 { 0%, 9% { opacity: 1; } 10%, 55% { opacity: 0; } 57%, 100% { opacity: 1; } }
+@keyframes hexin5 { 0%, 9% { opacity: 1; } 10%, 67% { opacity: 0; } 69%, 100% { opacity: 1; } }
+.lock {
+  position: absolute; top: 4.2%; left: 5.2%; display: inline-flex; align-items: center; gap: 0.5cqw;
+  background: #f4f5f8; color: #14161b; font-family: var(--font-mono); font-size: 1.05cqw; font-weight: 600;
+  padding: 0.45cqw 0.9cqw; border-radius: 99px; box-shadow: 0 0.4cqw 1.2cqw rgb(0 0 0 / 0.35);
+  animation: lockmove 9s infinite; opacity: 0;
+}
+.lock svg { width: 1.2cqw; height: 1.2cqw; }
+@keyframes lockmove {
+  0%, 11% { opacity: 0; transform: translateX(0); }
+  13%, 21% { opacity: 1; transform: translateX(0); }
+  25%, 33% { opacity: 1; transform: translateX(19.6cqw); }
+  37%, 45% { opacity: 1; transform: translateX(39.2cqw); }
+  49%, 57% { opacity: 1; transform: translateX(58.8cqw); }
+  61%, 69% { opacity: 1; transform: translateX(78.4cqw); }
+  73%, 100% { opacity: 0; transform: translateX(78.4cqw); }
+}
+.coord .caption { position: absolute; left: 2%; right: 2%; bottom: 6%; display: flex; justify-content: space-between; gap: 2cqw; font-family: var(--font-body); font-size: 1.25cqw; color: #9ba3b2; }
+.coord .caption b { color: #e6e8ee; font-weight: 600; }
+
+/* ---------- menu: click the name, pick a color with live preview ---------- */
+.menu { aspect-ratio: 16 / 10; }
+.menu .win { inset: 6% 6% 6% 6%; font-size: 1.35cqw; }
+.menu .sb { animation: preview 9s infinite; }
+@keyframes preview {
+  0%, 46% { background: #2563eb; color: #fff; }
+  47%, 52% { background: #0f766e; color: #fff; }
+  53%, 58% { background: #15803d; color: #fff; }
+  59%, 95% { background: #7e22ce; color: #fff; }
+  97%, 100% { background: #2563eb; color: #fff; }
+}
+.qp {
+  position: absolute; left: 50%; top: 11%; width: 56%; transform: translateX(-50%);
+  background: #25272e; border: 1px solid #3a3d46; border-radius: 0.9cqw; box-shadow: 0 1.6cqw 4cqw rgb(0 0 0 / 0.5);
+  font-family: var(--font-body); font-size: 1.3cqw; color: #d8dbe2; overflow: hidden; opacity: 0;
+}
+.qp .q-title { padding: 0.8cqw 1.2cqw 0.4cqw; font-size: 1.1cqw; color: #8f95a1; text-align: center; }
+.qp .q-input { margin: 0 1cqw 0.8cqw; padding: 0.55cqw 0.8cqw; border: 1px solid #4a7cff; border-radius: 0.5cqw; color: #8f95a1; font-size: 1.15cqw; }
+.qp ul { list-style: none; margin: 0; padding: 0 0 0.6cqw; position: relative; }
+.qp li { display: flex; align-items: center; gap: 0.9cqw; padding: 0.42cqw 1.2cqw; white-space: nowrap; position: relative; z-index: 1; }
+.qp li .d { margin-left: auto; color: #8f95a1; font-size: 1.05cqw; }
+.qp li i { width: 1.3cqw; height: 1.3cqw; border-radius: 50%; display: inline-block; flex: none; box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.25); }
+.qp .hl { position: absolute; left: 0.5cqw; right: 0.5cqw; height: 2.35cqw; top: 0; border-radius: 0.45cqw; background: #04395e; z-index: 0; }
+.qp.actions { animation: qp1 9s infinite; }
+.qp.actions .hl { animation: hl1 9s infinite; }
+.qp.colors { animation: qp2 9s infinite; }
+.qp.colors .hl { animation: hl2 9s infinite; }
+@keyframes qp1 { 0%, 23% { opacity: 0; transform: translateX(-50%) translateY(-0.6cqw); } 25%, 38% { opacity: 1; transform: translateX(-50%); } 39.5%, 100% { opacity: 0; transform: translateX(-50%); } }
+@keyframes hl1 { 0%, 31% { transform: translateY(0); } 33%, 100% { transform: translateY(2.35cqw); } }
+@keyframes qp2 { 0%, 39.5% { opacity: 0; } 41%, 66% { opacity: 1; } 68%, 100% { opacity: 0; } }
+@keyframes hl2 { 0%, 46% { transform: translateY(0); } 47%, 52% { transform: translateY(2.35cqw); } 53%, 58% { transform: translateY(4.7cqw); } 59%, 100% { transform: translateY(7.05cqw); } }
+.pointer { position: absolute; width: 2.4cqw; height: 2.4cqw; left: 60%; top: 55%; animation: point 9s infinite; z-index: 9; filter: drop-shadow(0 0.2cqw 0.4cqw rgb(0 0 0 / 0.5)); }
+@keyframes point {
+  0%, 8% { left: 60%; top: 55%; transform: none; }
+  20%, 23% { left: 9.5%; top: 88.5%; transform: none; }
+  24% { left: 9.5%; top: 88.5%; transform: scale(0.85); }
+  25%, 28% { left: 9.5%; top: 88.5%; transform: none; }
+  34%, 37% { left: 40%; top: 27.5%; transform: none; }
+  38% { left: 40%; top: 27.5%; transform: scale(0.85); }
+  39%, 61% { left: 40%; top: 27.5%; transform: none; }
+  64%, 65% { left: 40%; top: 39%; transform: none; }
+  66% { left: 40%; top: 39%; transform: scale(0.85); }
+  68%, 100% { left: 60%; top: 55%; transform: none; }
+}
+.toast { position: absolute; left: 7.2%; bottom: 3.6%; font-family: var(--font-body); font-size: 1.2cqw; color: #e7e9ee; background: rgb(0 0 0 / 0.55); padding: 0.4cqw 0.9cqw; border-radius: 0.5cqw; opacity: 0; animation: toast 9s infinite; }
+@keyframes toast { 0%, 67% { opacity: 0; } 69%, 90% { opacity: 1; } 93%, 100% { opacity: 0; } }
+
+/* ---------- git: the color is on disk, Git never sees it ---------- */
+.gitstage { aspect-ratio: 16 / 9; }
+.gitstage .win { top: 7%; bottom: 7%; font-size: 1.28cqw; }
+.gitstage .editor { left: 3%; width: 51%; }
+.gitstage .term { left: 56%; right: 3%; z-index: 2; }
+.gitstage .win .code { line-height: 1.7; }
+.band { background: color-mix(in srgb, #0f766e 26%, transparent); display: block; margin-inline: -1.4cqw; padding-inline: 1.4cqw; position: relative; }
+.band .tag { position: absolute; right: 1cqw; bottom: 0.25cqw; font-family: var(--font-body); font-size: 0.95cqw; background: #0f766e; color: #fff; border-radius: 0.4cqw; padding: 0 0.6cqw; }
+.swap { display: inline-grid; }
+.swap > span { grid-area: 1 / 1; }
+.swap .a { animation: swapa 10s infinite; }
+.swap .b { animation: swapb 10s infinite; }
+@keyframes swapa { 0%, 5% { opacity: 0; } 6%, 47% { opacity: 1; } 48%, 100% { opacity: 0; } }
+@keyframes swapb { 0%, 5% { opacity: 1; } 6%, 47% { opacity: 0; } 48%, 100% { opacity: 1; } }
+.term .code { font-size: 1.25cqw; }
+.prompt { color: #7fd1a8; }
+.typed { display: inline-block; overflow: hidden; vertical-align: bottom; white-space: pre; }
+.t1 { width: 10ch; animation: type1 10s infinite steps(10, end); }
+.t2 { width: 8ch; animation: type2 10s infinite steps(8, end); }
+@keyframes type1 { 0%, 9% { width: 10ch; } 10% { width: 0; } 20%, 100% { width: 10ch; } }
+@keyframes type2 { 0%, 9% { width: 8ch; } 10%, 52% { width: 0; } 61%, 100% { width: 8ch; } }
+.out1 { animation: out1 10s infinite; }
+.out2 { animation: out2 10s infinite; }
+.line2 { animation: line2 10s infinite; }
+@keyframes out1 { 0%, 9% { opacity: 1; } 10%, 21% { opacity: 0; } 23%, 100% { opacity: 1; } }
+@keyframes line2 { 0%, 9% { opacity: 1; } 10%, 49% { opacity: 0; } 51%, 100% { opacity: 1; } }
+@keyframes out2 { 0%, 9% { opacity: 1; } 10%, 62% { opacity: 0; } 64%, 100% { opacity: 1; } }
+.del { color: #ff8a8a; } .add { color: #8be28b; } .dim { color: var(--win-dim); }
+
+/* ---------- privacy + install ---------- */
+.install { display: grid; gap: 16px; justify-items: start; padding: 32px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; }
+.install h2 { font-family: var(--font-display); font-weight: 900; font-size: clamp(40px, 6vw, 64px); text-transform: uppercase; line-height: 0.92; }
+.install p { color: var(--muted); max-width: 40em; }
+footer { display: flex; flex-wrap: wrap; gap: 8px 22px; padding-block: 28px 0; color: var(--muted); font-size: 14px; }
+
+/* ---------- launch kit ---------- */
+.kit h1 { font-family: var(--font-display); font-weight: 900; font-size: clamp(44px, 7vw, 80px); text-transform: uppercase; line-height: 0.9; margin-block: 28px 12px; }
+.kit .intro { color: var(--muted); max-width: 46em; font-size: 18px; }
+.kit h2 { font-family: var(--font-display); font-weight: 800; font-size: 34px; text-transform: uppercase; letter-spacing: 0.01em; margin-block: 44px 16px; }
+.kit h3 { font-size: 18px; font-weight: 700; }
+.dest { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.dest article { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 20px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.dest .tape { font-size: 19px; justify-self: start; }
+.dest p, .dest li { color: var(--muted); font-size: 15px; }
+.dest ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+.dest .url { font-family: var(--font-mono); font-size: 12.5px; overflow-wrap: anywhere; }
+.status-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.status-grid > div { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; min-width: 0; }
+.checklist { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 9px; }
+.checklist li { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 8px; font-size: 15px; }
+.checklist .mark { font-weight: 700; }
+.checklist.done .mark { color: var(--ok); }
+.checklist.todo .mark { color: var(--todo); }
+.checklist small { display: block; color: var(--muted); font-size: 13.5px; }
+.pill { display: inline-block; font: 700 12px/1 var(--font-body); letter-spacing: 0.06em; text-transform: uppercase; padding: 5px 8px; border-radius: 99px; }
+.pill.ok { background: color-mix(in srgb, var(--ok) 16%, transparent); color: var(--ok); }
+.pill.todo { background: color-mix(in srgb, var(--todo) 16%, transparent); color: var(--todo); }
+ol.steps { list-style: none; counter-reset: step; margin: 0; padding: 0; display: grid; gap: 14px; }
+ol.steps > li { counter-increment: step; display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 14px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; }
+ol.steps > li::before { content: counter(step); font-family: var(--font-display); font-weight: 900; font-size: 34px; line-height: 1; color: var(--accent); }
+ol.steps > li > div { display: grid; gap: 8px; min-width: 0; }
+ol.steps p { color: var(--muted); font-size: 15.5px; }
+pre.block { margin: 0; background: var(--ground); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; overflow-x: auto; font-size: 13px; line-height: 1.6; position: relative; }
+.blockwrap { display: grid; gap: 4px; min-width: 0; }
+.blockwrap .copy { justify-self: end; }
+.callout { border: 1px solid color-mix(in srgb, var(--todo) 45%, var(--line)); background: color-mix(in srgb, var(--todo) 8%, var(--panel)); border-radius: 12px; padding: 16px 18px; display: grid; gap: 6px; }
+.callout p { font-size: 15.5px; }
+.facts-table { width: 100%; border-collapse: collapse; font-size: 15px; }
+.facts-table th, .facts-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.facts-table th { font-weight: 700; white-space: nowrap; }
+.facts-table td { color: var(--muted); }
+.tablewrap { overflow-x: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; }
+.release { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+.release > div { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.release ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; color: var(--muted); font-size: 15px; }
+
+/* ---------- responsive ---------- */
+@media (max-width: 860px) {
+  .hero, section.feature, section.feature.flip { grid-template-columns: minmax(0, 1fr); }
+  section.feature.flip .copytext { order: 0; }
+  .problem, .notes, .editors .intro, .dest, .status-grid, .release { grid-template-columns: minmax(0, 1fr); }
+  .editor-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hero { padding-block: 24px 40px; }
+}
+@media (max-width: 520px) {
+  body { font-size: 16px; }
+  .tablist button { padding: 8px 11px; font-size: 14px; }
+  .brand { font-size: 22px; }
+  ol.steps > li { grid-template-columns: minmax(0, 1fr); }
+  ol.steps > li::before { font-size: 26px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .qp.actions { opacity: 1; }
+  .qp.actions .hl { transform: translateY(2.35cqw); }
+  .qp.colors, .lock, .toast, .pointer { display: none; }
+}
+
+/* ---------- render mode (local only): one scene at a fixed size, for README GIFs ---------- */
+.render-mode body { padding: 0; background: #12151b; }
+.render-mode body > *:not(.render-target) { display: none !important; }
+.render-target { width: 880px !important; margin: 0 !important; border-radius: 0 !important; border: 0 !important; }
+</style>
+</head>
+<body>
+<header class="tabs wrap" role="banner">
+  <div class="brand">
+    <svg viewBox="0 0 128 128" aria-hidden="true"><rect width="128" height="128" rx="28" fill="#0f172a"/><rect x="18" y="22" width="92" height="84" rx="12" fill="#1e293b"/><circle cx="30" cy="34" r="3.5" fill="#475569"/><circle cx="41" cy="34" r="3.5" fill="#475569"/><circle cx="52" cy="34" r="3.5" fill="#475569"/><rect x="28" y="48" width="44" height="5" rx="2.5" fill="#334155"/><rect x="28" y="59" width="62" height="5" rx="2.5" fill="#334155"/><path d="M18 84h92v10a12 12 0 0 1-12 12H30a12 12 0 0 1-12-12z" fill="#2563eb"/><rect x="26" y="90" width="34" height="9" rx="4.5" fill="#fff"/><circle cx="98" cy="94.5" r="4" fill="#fff" opacity=".85"/></svg>
+    Nameplate
+  </div>
+  <div class="tablist" role="tablist" aria-label="Page">
+    <button role="tab" id="tab-product" aria-controls="product" aria-selected="true">Product page</button>
+  </div>
+</header>
+
+<main id="product" class="wrap" role="tabpanel" aria-labelledby="tab-product">
+  <section class="hero">
+    <div>
+      <h1>Which project is this window?</h1>
+      <p class="lede">With a few VS Code windows open, they all look the same. <strong>Nameplate puts the project's name in the status bar and gives every project its own status bar color</strong>, so you can tell the windows apart at a glance, even the ones in the background.</p>
+      <div class="cta">
+        <a class="btn primary" href="https://marketplace.visualstudio.com/items?itemName=rowhitswami.nameplate">Visual Studio Marketplace</a>
+        <a class="btn" href="https://open-vsx.org/extension/rowhitswami/nameplate">Open VSX</a>
+      </div>
+      <div class="cta" style="margin-top:12px">
+        <div class="cmd"><span id="cmd-ext">ext install rowhitswami.nameplate</span><button class="copy" type="button" data-copy="cmd-ext">Copy</button></div>
+      </div>
+    </div>
+    <div class="stage desk dark render-scene" data-scene="hero" role="img" aria-label="Four VS Code windows, first without Nameplate (all alike), then with a name and a different status bar color each">
+      <div class="win">
+        <div class="titlebar"><span class="dots"><i></i><i></i><i></i></span><span class="t">cart.ts — storefront</span></div>
+        <div class="body"><div class="activity"></div><div class="tree"><b style="width:80%"></b><b style="width:60%"></b><b style="width:70%"></b><b style="width:50%"></b><b style="width:66%"></b></div>
+<div class="code"><span class="k">export function</span> <span class="f">total</span>(items) {
+  <span class="k">return</span> items.<span class="f">reduce</span>(
+    (sum, item) =&gt; sum + item.price, <span class="n">0</span>)
+}</div></div>
+        <div class="sb" style="--c:#2563eb"><span class="name"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3h4l1.5 1.5h7.5v8.5h-13z"/></svg>STOREFRONT</span><span class="muted">⎇ main</span><span class="right">Ln 12, Col 4</span></div>
+      </div>
+      <div class="win">
+        <div class="titlebar"><span class="dots"><i></i><i></i><i></i></span><span class="t">invoice.go — billing-api</span></div>
+        <div class="body"><div class="activity"></div><div class="tree"><b style="width:70%"></b><b style="width:85%"></b><b style="width:55%"></b><b style="width:62%"></b></div>
+<div class="code"><span class="k">func</span> <span class="f">Issue</span>(c Customer) (*Invoice, <span class="k">error</span>) {
+	lines := c.<span class="f">OpenCharges</span>()
+	<span class="k">return</span> <span class="f">newInvoice</span>(c.ID, lines)
+}</div></div>
+        <div class="sb" style="--c:#7e22ce"><span class="name"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3h4l1.5 1.5h7.5v8.5h-13z"/></svg>BILLING API</span><span class="muted">⎇ fix/tax</span><span class="right">Go</span></div>
+      </div>
+      <div class="win">
+        <div class="titlebar"><span class="dots"><i></i><i></i><i></i></span><span class="t">App.tsx — mobile-app</span></div>
+        <div class="body"><div class="activity"></div><div class="tree"><b style="width:60%"></b><b style="width:75%"></b><b style="width:45%"></b></div>
+<div class="code"><span class="k">export default function</span> <span class="f">App</span>() {
+  <span class="k">return</span> &lt;<span class="f">Navigation</span> /&gt;
+}</div></div>
+        <div class="sb" style="--c:#15803d"><span class="name"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3h4l1.5 1.5h7.5v8.5h-13z"/></svg>MOBILE APP</span><span class="muted">⎇ main</span><span class="right">TypeScript JSX</span></div>
+      </div>
+      <div class="win">
+        <div class="titlebar"><span class="dots"><i></i><i></i><i></i></span><span class="t">index.md — docs</span></div>
+        <div class="body"><div class="activity"></div><div class="tree"><b style="width:65%"></b><b style="width:50%"></b><b style="width:72%"></b><b style="width:58%"></b></div>
+<div class="code"><span class="k">#</span> Getting started
+
+Install the CLI, then run:
+<span class="s">`docs build --watch`</span></div></div>
+        <div class="sb" style="--c:#c2410c"><span class="name"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3h4l1.5 1.5h7.5v8.5h-13z"/></svg>DOCS</span><span class="muted">⎇ main</span><span class="right">Markdown</span></div>
+      </div>
+      <div class="state"><span class="with">With Nameplate</span><span class="without">Without Nameplate</span></div>
+    </div>
+  </section>
+
+  <section class="problem">
+    <h2>The problem</h2>
+    <div class="prose">
+      <p>VS Code gives every window the same theme and the same layout. The only sign of which project a window belongs to is the folder name in the title bar, in small gray text, and after a few quick switches you stop reading it.</p>
+      <p>That is how a migration runs in the wrong terminal, a commit gets pushed from the wrong repository, or you spend ten minutes editing a second clone of a project and wonder why nothing changes.</p>
+      <p><strong>A color is recognized before you read anything.</strong> Nameplate gives each project one, keeps it the same every day, and puts the name next to it so there is no doubt what the color means.</p>
+    </div>
+  </section>
+
+  <section class="feature">
+    <div class="copytext">
+      <h2>A name and a color for each project</h2>
+      <p>The name comes from the project: the folder, <code>package.json</code>, Expo's <code>app.json</code>, <code>pyproject.toml</code>, <code>go.mod</code>, <code>Cargo.toml</code> or the Git remote. If one of them spells it with capitals, such as <strong>BrightDesk</strong>, that spelling is used.</p>
+      <p>The color is worked out from the Git remote, so the same repository has the same color on your laptop and your desktop. Red and yellow are left out of the automatic colors because they look like errors and warnings.</p>
+    </div>
+    <div class="tapes" role="list" aria-label="The eleven automatic colors">
+      <figure role="listitem"><span class="tape" style="--c:#2563eb">Storefront</span><figcaption>Blue #2563eb</figcaption></figure>
+      <figure role="listitem"><span class="tape" style="--c:#06b6d4;--t:#000">Docs</span><figcaption>Cyan #06b6d4</figcaption></figure>
+      <figure role="listitem"><span class="tape" style="--c:#0f766e">Infra</span><figcaption>Teal #0f766e</figcaption></figure>
+      <figure role="listitem"><span class="tape" style="--c:#15803d">Mobile App</span><figcaption>Green #15803d</figcaption></figure>
+      <figure role="listitem"><span class="tape" style="--c:#65a30d;--t:#000">Search</span><figcaption>Lime #65a30d</figcaption></figure>
+      <figure role="listitem"><span class="tape" style="--c:#c2410c">Website</span><figcaption>Orange #c2410c</figcaption></figure>
+      <figure role="listitem"><span class="tape" style="--c:#8a4513">Admin</span><figcaption>Brown #8a4513</figcaption></figure>
+      <figure role="listitem"><span class="tape" style="--c:#d41f6f">Analytics</span><figcaption>Pink #d41f6f</figcaption></figure>
+      <figure role="listitem"><span class="tape" style="--c:#a21caf">Auth</span><figcaption>Magenta #a21caf</figcaption></figure>
+      <figure role="listitem"><span class="tape" style="--c:#7e22ce">Billing API</span><figcaption>Purple #7e22ce</figcaption></figure>
+      <figure role="listitem"><span class="tape" style="--c:#4338ca">Design System</span><figcaption>Indigo #4338ca</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="feature flip">
+    <div class="copytext">
+      <h2>Windows opened together still differ</h2>
+      <p>Start VS Code with five projects and each window gets a different color. The windows take turns: each one checks which colors are already on screen and picks one that looks clearly different. Colors are compared the way the eye sees them, so near-identical shades such as teal and green count as the same color.</p>
+      <p>If two windows ever end up alike, the newer one changes color and shows a short message saying so.</p>
+    </div>
+    <div class="stage coord dark render-scene" data-scene="coordinate" role="img" aria-label="Five windows open at the same moment; a lock visits each one in turn and each status bar takes a different color">
+      <div class="win"><div class="titlebar"><span class="dots"><i></i><i></i><i></i></span></div><div class="body"><div class="activity"></div><div class="lines"><b style="width:70%"></b><b style="width:85%"></b><b style="width:55%"></b><b style="width:78%"></b><b style="width:40%"></b><b style="width:66%"></b></div></div><div class="sb" style="--c:#d41f6f"><span class="name">STOREFRONT</span></div></div>
+      <div class="win"><div class="titlebar"><span class="dots"><i></i><i></i><i></i></span></div><div class="body"><div class="activity"></div><div class="lines"><b style="width:70%"></b><b style="width:85%"></b><b style="width:55%"></b><b style="width:78%"></b><b style="width:40%"></b><b style="width:66%"></b></div></div><div class="sb" style="--c:#06b6d4;--t:#000"><span class="name">BILLING API</span></div></div>
+      <div class="win"><div class="titlebar"><span class="dots"><i></i><i></i><i></i></span></div><div class="body"><div class="activity"></div><div class="lines"><b style="width:70%"></b><b style="width:85%"></b><b style="width:55%"></b><b style="width:78%"></b><b style="width:40%"></b><b style="width:66%"></b></div></div><div class="sb" style="--c:#8a4513"><span class="name">MOBILE APP</span></div></div>
+      <div class="win"><div class="titlebar"><span class="dots"><i></i><i></i><i></i></span></div><div class="body"><div class="activity"></div><div class="lines"><b style="width:70%"></b><b style="width:85%"></b><b style="width:55%"></b><b style="width:78%"></b><b style="width:40%"></b><b style="width:66%"></b></div></div><div class="sb" style="--c:#65a30d;--t:#000"><span class="name">DOCS</span></div></div>
+      <div class="win"><div class="titlebar"><span class="dots"><i></i><i></i><i></i></span></div><div class="body"><div class="activity"></div><div class="lines"><b style="width:70%"></b><b style="width:85%"></b><b style="width:55%"></b><b style="width:78%"></b><b style="width:40%"></b><b style="width:66%"></b></div></div><div class="sb" style="--c:#2563eb"><span class="name">ADMIN</span></div></div>
+      <span class="hex">#d41f6f</span><span class="hex">#06b6d4</span><span class="hex">#8a4513</span><span class="hex">#65a30d</span><span class="hex">#2563eb</span>
+      <span class="lock"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4.5 7V5a3.5 3.5 0 0 1 7 0v2h1v7h-9V7zm1.5 0h4V5a2 2 0 0 0-4 0z"/></svg>registry.lock</span>
+      <div class="caption"><span><b>5 windows</b> started within 120 ms</span><span>one at a time, <b>5 different colors</b></span></div>
+    </div>
+  </section>
+
+  <section class="feature">
+    <div class="copytext">
+      <h2>Change it from the status bar</h2>
+      <p>Click the name to rename the project, pick a color with a live preview, add a label such as <strong>PROD</strong>, copy the path or the Git remote, or open the repository in the browser.</p>
+      <p>These are ordinary VS Code menus, and every action is also in the Command Palette.</p>
+    </div>
+    <div class="stage menu dark render-scene" data-scene="menu" role="img" aria-label="Clicking the project name opens a menu; choosing Change Project Color shows a palette and the status bar previews each color">
+      <div class="win">
+        <div class="titlebar"><span class="dots"><i></i><i></i><i></i></span><span class="t">cart.ts — storefront</span></div>
+        <div class="body"><div class="activity"></div><div class="tree"><b style="width:80%"></b><b style="width:60%"></b><b style="width:70%"></b><b style="width:50%"></b><b style="width:66%"></b><b style="width:40%"></b></div>
+<div class="code"><span class="k">import</span> { total } <span class="k">from</span> <span class="s">'./cart'</span>
+
+<span class="k">export default function</span> <span class="f">Checkout</span>({ cart }) {
+  <span class="k">const</span> amount = <span class="f">total</span>(cart.items)
+  <span class="k">return</span> &lt;<span class="f">PayButton</span> amount={amount} /&gt;
+}</div></div>
+        <div class="sb"><span class="name"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3h4l1.5 1.5h7.5v8.5h-13z"/></svg>Storefront</span><span class="muted">⎇ main</span><span class="right">TypeScript React</span></div>
+      </div>
+      <div class="qp actions">
+        <div class="q-title">Storefront: Project Actions</div>
+        <div class="q-input">Choose an action</div>
+        <ul><span class="hl"></span>
+          <li>✎ Rename Project…<span class="d">Storefront</span></li>
+          <li>◐ Change Project Color…<span class="d">Blue (#2563eb)</span></li>
+          <li>⌗ Set Environment Label…<span class="d">none</span></li>
+          <li>↻ Regenerate Automatic Color</li>
+          <li>ⓘ Project Information</li>
+        </ul>
+      </div>
+      <div class="qp colors">
+        <div class="q-title">Color for Storefront</div>
+        <div class="q-input">Pick a status bar color</div>
+        <ul><span class="hl"></span>
+          <li><i style="background:#2563eb"></i>Automatic<span class="d">Blue, current</span></li>
+          <li><i style="background:#0f766e"></i>Teal<span class="d">#0f766e</span></li>
+          <li><i style="background:#15803d"></i>Green<span class="d">#15803d</span></li>
+          <li><i style="background:#7e22ce"></i>Purple<span class="d">#7e22ce</span></li>
+          <li><i style="background:#c2410c"></i>Orange<span class="d">#c2410c</span></li>
+        </ul>
+      </div>
+      <svg class="pointer" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 2l14 12-6.2.8L16 22l-3 1.2-3.2-7.4L5 20z" fill="#fff" stroke="#111" stroke-width="1.2" stroke-linejoin="round"/></svg>
+      <span class="toast">Storefront is now purple</span>
+    </div>
+  </section>
+
+  <section class="feature flip">
+    <div class="copytext">
+      <h2>Your repository stays clean</h2>
+      <p>VS Code keeps a window's colors in the project's <code>.vscode/settings.json</code>, and many projects commit that file. Nameplate adds a small local Git filter for it, so Git reads the file without Nameplate's lines.</p>
+      <p><code>git status</code> stays clean, the colors never end up in a commit, and your own edits to the file show up as usual. There is nothing to set up, and Nameplate removes the filter when it stops coloring the project.</p>
+    </div>
+    <div class="stage gitstage dark render-scene" data-scene="git" role="img" aria-label="An editor shows Nameplate's color lines in settings.json; a terminal shows git status clean, and after an edit, git diff shows only that edit">
+      <div class="win editor">
+        <div class="titlebar"><span class="dots"><i></i><i></i><i></i></span><span class="t">.vscode/settings.json — infra</span></div>
+        <div class="body" style="grid-template-columns: 3.2cqw 1fr"><div class="activity"></div>
+<div class="code">{
+  <span class="s">"editor.codeActionsOnSave"</span>: {
+    <span class="s">"source.fixAll"</span>: <span class="swap"><span class="a s">"explicit"</span><span class="b s">"always"</span></span>
+  },
+<span class="band"><span class="tag">added by Nameplate, hidden from Git</span>  <span class="s">"workbench.colorCustomizations"</span>: {
+    <span class="s">"statusBar.background"</span>: <span class="s">"#0f766e"</span>,
+    <span class="s">"statusBar.foreground"</span>: <span class="s">"#ffffff"</span>
+  }</span>
+}</div></div>
+        <div class="sb" style="--c:#0f766e"><span class="name"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3h4l1.5 1.5h7.5v8.5h-13z"/></svg>INFRA</span><span class="muted">⎇ main</span><span class="right">JSON with Comments</span></div>
+      </div>
+      <div class="win term">
+        <div class="titlebar"><span class="dots"><i></i><i></i><i></i></span><span class="t">Terminal: zsh</span></div>
+<div class="code" style="flex:1"><span class="prompt">infra $</span> <span class="typed t1">git status</span>
+<span class="out1">On branch main
+<span class="dim">nothing to commit, working tree clean</span></span>
+
+<span class="line2"><span class="prompt">infra $</span> <span class="typed t2">git diff</span></span>
+<span class="out2"><span class="dim">@@ .vscode/settings.json @@</span>
+<span class="del">-    "source.fixAll": "explicit"</span>
+<span class="add">+    "source.fixAll": "always"</span>
+<span class="dim">(your edit only, no colors)</span></span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="editors">
+    <div class="intro">
+      <h2>Runs in your editor</h2>
+      <div class="prose"><p>Nameplate uses only the standard extension API, so it runs in VS Code and in the editors built on it. Editors that can't use Microsoft's Marketplace install it from Open VSX.</p></div>
+    </div>
+    <ul class="editor-grid">
+      <li class="ed">
+        <div class="ed-win" aria-hidden="true"><div class="tb"><i></i><i></i><i></i></div><div class="lines"><b style="width:70%"></b><b style="width:52%"></b><b style="width:82%"></b><b style="width:40%"></b></div><div class="bar" style="--c:#2563eb;--t:#fff;--i:0"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3h4l1.5 1.5h7.5v8.5h-13z"/></svg>VS CODE</div></div>
+        <div class="ed-meta"><strong>VS Code</strong><span>Microsoft</span></div>
+        <span class="reg">Visual Studio Marketplace</span>
+      </li>
+      <li class="ed">
+        <div class="ed-win" aria-hidden="true"><div class="tb"><i></i><i></i><i></i></div><div class="lines"><b style="width:70%"></b><b style="width:52%"></b><b style="width:82%"></b><b style="width:40%"></b></div><div class="bar" style="--c:#7e22ce;--t:#fff;--i:1"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3h4l1.5 1.5h7.5v8.5h-13z"/></svg>CURSOR</div></div>
+        <div class="ed-meta"><strong>Cursor</strong><span>Anysphere</span></div>
+        <span class="reg">Open VSX</span>
+      </li>
+      <li class="ed">
+        <div class="ed-win" aria-hidden="true"><div class="tb"><i></i><i></i><i></i></div><div class="lines"><b style="width:70%"></b><b style="width:52%"></b><b style="width:82%"></b><b style="width:40%"></b></div><div class="bar" style="--c:#0f766e;--t:#fff;--i:2"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3h4l1.5 1.5h7.5v8.5h-13z"/></svg>WINDSURF</div></div>
+        <div class="ed-meta"><strong>Windsurf</strong><span>Cognition</span></div>
+        <span class="reg">Open VSX</span>
+      </li>
+      <li class="ed">
+        <div class="ed-win" aria-hidden="true"><div class="tb"><i></i><i></i><i></i></div><div class="lines"><b style="width:70%"></b><b style="width:52%"></b><b style="width:82%"></b><b style="width:40%"></b></div><div class="bar" style="--c:#c2410c;--t:#fff;--i:3"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3h4l1.5 1.5h7.5v8.5h-13z"/></svg>ANTIGRAVITY</div></div>
+        <div class="ed-meta"><strong>Antigravity</strong><span>Google</span></div>
+        <span class="reg">Open VSX</span>
+      </li>
+      <li class="ed">
+        <div class="ed-win" aria-hidden="true"><div class="tb"><i></i><i></i><i></i></div><div class="lines"><b style="width:70%"></b><b style="width:52%"></b><b style="width:82%"></b><b style="width:40%"></b></div><div class="bar" style="--c:#d41f6f;--t:#fff;--i:4"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3h4l1.5 1.5h7.5v8.5h-13z"/></svg>KIRO</div></div>
+        <div class="ed-meta"><strong>Kiro</strong><span>Amazon Web Services</span></div>
+        <span class="reg">Open VSX</span>
+      </li>
+      <li class="ed">
+        <div class="ed-win" aria-hidden="true"><div class="tb"><i></i><i></i><i></i></div><div class="lines"><b style="width:70%"></b><b style="width:52%"></b><b style="width:82%"></b><b style="width:40%"></b></div><div class="bar" style="--c:#15803d;--t:#fff;--i:5"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3h4l1.5 1.5h7.5v8.5h-13z"/></svg>POSITRON</div></div>
+        <div class="ed-meta"><strong>Positron</strong><span>Posit</span></div>
+        <span class="reg">Open VSX</span>
+      </li>
+      <li class="ed">
+        <div class="ed-win" aria-hidden="true"><div class="tb"><i></i><i></i><i></i></div><div class="lines"><b style="width:70%"></b><b style="width:52%"></b><b style="width:82%"></b><b style="width:40%"></b></div><div class="bar" style="--c:#4338ca;--t:#fff;--i:6"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3h4l1.5 1.5h7.5v8.5h-13z"/></svg>VSCODIUM</div></div>
+        <div class="ed-meta"><strong>VSCodium</strong><span>VSCodium project</span></div>
+        <span class="reg">Open VSX</span>
+      </li>
+      <li class="ed">
+        <div class="ed-win" aria-hidden="true"><div class="tb"><i></i><i></i><i></i></div><div class="lines"><b style="width:70%"></b><b style="width:52%"></b><b style="width:82%"></b><b style="width:40%"></b></div><div class="bar" style="--c:#06b6d4;--t:#000;--i:7"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3h4l1.5 1.5h7.5v8.5h-13z"/></svg>TRAE</div></div>
+        <div class="ed-meta"><strong>Trae</strong><span>ByteDance</span></div>
+        <span class="reg">.vsix file</span>
+      </li>
+    </ul>
+    <p class="foot">Any editor based on VS Code 1.85 or later can install the <code>.vsix</code> from the GitHub releases page (Extensions view, Install from VSIX). Remote windows over SSH, WSL and Dev Containers work too.</p>
+  </section>
+
+  <section class="notes">
+    <h2>Good to know</h2>
+    <ul>
+      <li>There is nothing to configure. Every open window is labeled as soon as the extension is installed.</li>
+      <li>It makes no network requests and collects no data.</li>
+      <li>The text on the status bar is white or black, whichever is easier to read on that color, with a contrast ratio of at least 4.5:1.</li>
+      <li>Colors set by you or by another extension, such as Peacock, are left alone, and turning Nameplate off restores what was there before.</li>
+      <li>The name is always shown, so the window can be identified without relying on color.</li>
+    </ul>
+  </section>
+
+  <section class="install">
+    <h2>Install</h2>
+    <p>Search for Nameplate in the Extensions view, or use one of these links.</p>
+    <div class="cta" style="margin-top:0">
+      <a class="btn primary" href="https://marketplace.visualstudio.com/items?itemName=rowhitswami.nameplate">Visual Studio Marketplace</a>
+      <a class="btn" href="https://open-vsx.org/extension/rowhitswami/nameplate">Open VSX</a>
+      <a class="btn" href="https://github.com/rowhitswami/nameplate">Source on GitHub</a>
+    </div>
+  </section>
+
+  <footer>
+    <span>Nameplate, MIT License</span>
+    <a href="https://github.com/rowhitswami/nameplate">github.com/rowhitswami/nameplate</a>
+  </footer>
+</main>
+
+<script>
+(function () {
+  // Render mode (local only, for README GIFs): ?render=<scene> shows one scene at a fixed size.
+  var render = null;
+  try { render = new URLSearchParams(location.search).get('render'); } catch (e) {}
+  if (render) {
+    var target = document.querySelector('[data-scene="' + render + '"]');
+    if (target) {
+      document.documentElement.classList.add('render-mode');
+      target.classList.add('render-target');
+      document.body.appendChild(target);
+    }
+  }
+
+  // Tabs, deep-linkable with #launch.
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
+  function show(id) {
+    tabs.forEach(function (tab) {
+      var on = tab.getAttribute('aria-controls') === id;
+      tab.setAttribute('aria-selected', on ? 'true' : 'false');
+      var panel = document.getElementById(tab.getAttribute('aria-controls'));
+      if (panel) { panel.hidden = !on; }
+    });
+    try { localStorage.setItem('nameplate-tab', id); } catch (e) {}
+  }
+  tabs.forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      show(tab.getAttribute('aria-controls'));
+      window.scrollTo({ top: 0 });
+    });
+  });
+  if (tabs.length > 1) {
+    var initial = location.hash === '#launch' ? 'launch' : null;
+    if (!initial) { try { initial = localStorage.getItem('nameplate-tab'); } catch (e) {} }
+    if (initial && document.getElementById(initial)) { show(initial); }
+  }
+
+  // Light up the editor cards once, when they scroll into view.
+  var grid = document.querySelector('.editor-grid');
+  if (grid && 'IntersectionObserver' in window && !render) {
+    var seen = new IntersectionObserver(function (entries) {
+      if (entries.some(function (entry) { return entry.isIntersecting; })) {
+        grid.classList.add('play');
+        seen.disconnect();
+      }
+    }, { threshold: 0.35 });
+    seen.observe(grid);
+  }
+
+  // Copy buttons.
+  document.querySelectorAll('[data-copy]').forEach(function (button) {
+    button.addEventListener('click', function () {
+      var source = document.getElementById(button.getAttribute('data-copy'));
+      if (!source) { return; }
+      var text = source.textContent.replace(/\s+#.*$/gm, '').trim();
+      function done(label) { button.textContent = label; setTimeout(function () { button.textContent = 'Copy'; }, 1600); }
+      function select() {
+        var range = document.createRange(); range.selectNodeContents(source);
+        var selection = window.getSelection(); selection.removeAllRanges(); selection.addRange(range);
+        done('Selected');
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { done('Copied'); }, select);
+      } else { select(); }
+    });
+  });
+})();
+</script>
+</body>
+</html>

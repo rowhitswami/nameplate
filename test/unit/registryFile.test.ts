@@ -132,7 +132,7 @@ describe('registry file', () => {
         ),
       );
       for (const result of results) {
-        assert.equal(result.error, undefined, result.error);
+        assert.equal(result.error, undefined, `worker for ${result.key}: ${result.error ?? ''}`);
       }
       for (let i = 0; i < results.length; i++) {
         for (let j = i + 1; j < results.length; j++) {

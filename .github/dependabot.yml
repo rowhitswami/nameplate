@@ -7,6 +7,9 @@ updates:
     ignore:
       # Must stay equal to engines.vscode in package.json, or packaging fails.
       - dependency-name: '@types/vscode'
+      # Should describe the Node.js inside the oldest supported VS Code, not the newest Node.
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
     groups:
       dev-dependencies:
         dependency-type: development

@@ -34,7 +34,7 @@ jobs:
       - name: Package
         run: npx vsce package --out nameplate-${GITHUB_REF_NAME#v}.vsix
       - name: Create GitHub release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: nameplate-*.vsix
           generate_release_notes: true

@@ -23,7 +23,7 @@ jobs:
       - run: npm run build
       - name: Package (validation only)
         run: npx vsce package --out nameplate-ci.vsix
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: nameplate-vsix
           path: nameplate-ci.vsix
